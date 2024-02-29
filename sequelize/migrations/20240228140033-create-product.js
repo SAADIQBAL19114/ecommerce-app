@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable("Users", {
+    await queryInterface.createTable("Products", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -17,38 +17,37 @@ module.exports = {
         },
         trim: true,
       },
-      email: {
+      description: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          notNull: { msg: "email is required" },
-        },
-        unique: true,
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notNull: { msg: "password is required" },
+          notNull: { msg: "description is required" },
         },
       },
-      phone: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notNull: { msg: "phone is required" },
-        },
-      },
-      address: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notNull: { msg: "address is required" },
-        },
-      },
-      role: {
+      price: {
         type: DataTypes.INTEGER,
-        defaultValue: 0,
+        allowNull: false,
+        validate: {
+          notNull: { msg: "price is required" },
+        },
+      },
+      quantity: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          notNull: { msg: "quantity is required" },
+        },
+      },
+      image: {
+        type: DataTypes.STRING,
+      },
+      categoryId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "Categories",
+          id: "id",
+        },
       },
       createdAt: {
         allowNull: false,
@@ -61,6 +60,6 @@ module.exports = {
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable("Users");
+    await queryInterface.dropTable("Products");
   },
 };

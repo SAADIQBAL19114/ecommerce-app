@@ -2,6 +2,7 @@ const express = require("express");
 const {
   registerController,
   loginController,
+  getALlUsersController,
 } = require("../controllers/authController.js");
 const { requireSignIn, isAdmin } = require("../middlewares/authMiddleware.js");
 
@@ -15,6 +16,9 @@ router.post("/register", registerController);
 
 //LOGIN || POST
 router.post("/login", loginController);
+
+// GET ALL USERS || GET 
+router.get("/user", getALlUsersController);
 
 // test route
 router.get("/test",requireSignIn,isAdmin,(req,res) => {

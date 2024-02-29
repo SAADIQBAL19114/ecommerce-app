@@ -1,19 +1,21 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const {
+  Model
+} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
+  class Product extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ Cart, Order }) {
+    static associate({Category,Cart}) {
       // define association here
-      this.hasOne(Cart, { foreignKey: "userId" });
-      this.hasMany(Order, { foreignKey: "userId" });
+      this.belongsTo(Category, { foreignKey: "categoryId" });
+      this.hasMany(Cart, { foreignKey: "userId" });
     }
   }
-  User.init(
+  Product.init(
     {
       name: {
         type: DataTypes.STRING,
@@ -23,44 +25,35 @@ module.exports = (sequelize, DataTypes) => {
         },
         trim: true,
       },
-      email: {
+      description: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          notNull: { msg: "email is required" },
-        },
-        unique: true,
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notNull: { msg: "password is required" },
+          notNull: { msg: "description is required" },
         },
       },
-      phone: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notNull: { msg: "phone is required" },
-        },
-      },
-      address: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notNull: { msg: "address is required" },
-        },
-      },
-      role: {
+      price: {
         type: DataTypes.INTEGER,
-        defaultValue: 0,
+        allowNull: false,
+        validate: {
+          notNull: { msg: "price is required" },
+        },
+      },
+      quantity: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          notNull: { msg: "quantity is required" },
+        },
+      },
+      image: {
+        type: DataTypes.STRING,
       },
     },
     {
       sequelize,
-      modelName: "User",
+      modelName: "Product",
     }
   );
-  return User;
+  return Product;
 };

@@ -1,7 +1,6 @@
 const { hashPassword, comparePassword } = require("../helpers/authHelper");
 const { User } = require("../sequelize/models");
-const JWT = require("jsonwebtoken")
-
+const JWT = require("jsonwebtoken");
 
 // regsiter USER
 const registerController = async (req, res) => {
@@ -30,7 +29,13 @@ const registerController = async (req, res) => {
       });
     }
     const hashedPassword = await hashPassword(password);
-    const user = await User.create({name, email, password:hashedPassword, phone, address});
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+      address,
+    });
     res.status(201).json({
       message: "User Registered",
       data: user,
@@ -98,8 +103,32 @@ const loginController = async (req, res) => {
   }
 };
 
+// Get all USERS
+
+const getALlUsersController = async (req, res) => {
+  try {
+    const user = await User.findAll();
+    if (user != "") {
+      return res.status(200).json({
+        message: "Data Retrieved",
+        data: user,
+      });
+    } else {
+      return res.status(400).json({
+        message: "no user in the database",
+      });
+    }
+  } catch (error) {
+    console.log(err);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: err.message,
+    });
+  }
+};
 
 module.exports = {
   registerController,
-  loginController
+  loginController,
+  getALlUsersController,
 };
