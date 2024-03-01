@@ -24,20 +24,6 @@ module.exports = {
           notNull: { msg: "description is required" },
         },
       },
-      price: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        validate: {
-          notNull: { msg: "price is required" },
-        },
-      },
-      quantity: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        validate: {
-          notNull: { msg: "quantity is required" },
-        },
-      },
       image: {
         type: DataTypes.STRING,
       },

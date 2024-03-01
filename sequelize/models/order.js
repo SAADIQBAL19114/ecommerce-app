@@ -9,18 +9,38 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({User}) {
+    static associate({User, ProductDetails}) {
       // define association here
-      this.belongsTo(User, { foreignKey: "userId"});
+      // this.belongsTo(User, { foreignKey: "userId"});
+      // this.hasMany(ProductDetails, { foreignKey: "ProductDetailId" });
     }
   }
-  Order.init({
-    status:{
-      type:DataTypes.STRING
-    }, 
-  }, {
-    sequelize,
-    modelName: 'Order',
-  });
+  Order.init(
+    {
+      status: {
+        type: DataTypes.STRING,
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "Users",
+          id: "id",
+        },
+      },
+      ProductDetailId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "ProductDetails",
+          id: "id",
+        },
+      },
+    },
+    {
+      sequelize,
+      modelName: "Order",
+    }
+  );
   return Order;
 };

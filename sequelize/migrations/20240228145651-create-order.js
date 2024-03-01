@@ -20,6 +20,14 @@ module.exports = {
           id: "id",
         },
       },
+      ProductDetailId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "ProductDetails",
+          id: "id",
+        },
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,

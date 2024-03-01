@@ -2,35 +2,28 @@ const { Product } = require("../sequelize/models");
 
 const createProductController = async (req, res) => {
   try {
-    const { name, description, price, quantity, image } = req.body;
+    const { name, description, image,categoryId } = req.body;
     if (!name) {
       return res.send({ error: "Name is Required" });
     }
     if (!description) {
       return res.send({ error: "description is Required" });
     }
-    if (!price) {
-      return res.send({ error: "price is Required" });
-    }
-    if (!quantity) {
-      return res.send({ error: "quantity is Required" });
-    }
     const product = await Product.create({
       name,
       description,
-      price,
-      quantity,
       image,
+      categoryId
     });
     res.status(201).json({
-      message: "User Registered",
+      message: "Product created",
       data: product,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error in Registration",
+      message: "Error in Product creation",
       error,
     });
   }
