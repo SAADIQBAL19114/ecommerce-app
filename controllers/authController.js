@@ -8,7 +8,7 @@ const registerController = async (req, res) => {
   try {
     const { name, email, password, phone, address } = req.body;
     if (!name) {
-      return res.send({ error: "Name is Required" });
+      return res.send({ message: "Name is Required" });
     }
     if (!email) {
       return res.send({ message: "Email is Required" });
@@ -25,15 +25,17 @@ const registerController = async (req, res) => {
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({
-        message: "User already exist",
+      return res.status(200).send({
+        success: false,
+        message: "Already Register please login",
       });
     }
     const hashedPassword = await hashPassword(password);
     const user = await User.create({name, email, password:hashedPassword, phone, address});
     res.status(201).json({
+      success: true,
       message: "User Registered",
-      data: user,
+      user,
     });
   } catch (error) {
     console.log(error);
