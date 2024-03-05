@@ -24,10 +24,9 @@ const registerController = async (req, res) => {
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({
+      return res.status(200).send({
         success: false,
-        message: "User already exist",
-        user
+        message: "Already Register please login",
       });
     }
     const hashedPassword = await hashPassword(password);
