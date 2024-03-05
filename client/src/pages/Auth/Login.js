@@ -1,25 +1,35 @@
 import React, { useState } from "react";
 import Layout from "../../components/Layout/Layout";
-import api from "../../api/axios";
+import axios from "axios";
 import "../../styles/AuthStyles.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useAuth } from "../../context/auth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+  const [auth, setAuth] = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post("/api/v1/auth/login", {
+      const res = await axios.post("/api/v1/auth/login", {
         email,
         password,
       });
+      console.log("res>>>>>>>", res);
       if (res && res.data.success) {
         toast.success(res.data && res.data.message);
-        navigate("/");
+        setAuth({
+          ...auth,
+          user: res.data.user,
+          token: res.data.token,
+        });
+        localStorage.setItem("auth", JSON.stringify(res.data));
+        navigate(location.state || "/");
       } else {
         toast.error(res.data.message);
       }
@@ -59,7 +69,7 @@ const Login = () => {
               required
             />
           </div>
-          
+
           <button type="submit" className="btn btn-primary">
             Submit
           </button>
