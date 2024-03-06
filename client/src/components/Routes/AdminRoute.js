@@ -10,16 +10,20 @@ const AdminRoute = () => {
 
   useEffect(() => {
     const authCheck = async () => {
-      const res = await axios.get("/api/v1/auth/admin-auth");
-      if (res.data.ok) {
-        setOk(true);
-      } else {
-        setOk(false);
+      try {
+        const res = await axios.get("/api/v1/auth/admin-auth");
+        if (res.data.ok) {
+          setOk(true);
+        } else {
+          setOk(false);
+        }
+      } catch (error) {
+        console.log(error);
       }
     };
     if (auth?.token) authCheck();
   }, [auth?.token]);
-  return ok ? <Outlet /> : <Spinner />;
+  return ok ? <Outlet /> : <Spinner path="" />;
 };
 
 export default AdminRoute;
