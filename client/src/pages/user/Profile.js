@@ -1,9 +1,21 @@
-import React from 'react'
-
+import React from "react";
+import Layout from "../../components/Layout/Layout";
+import UserMenu from "../../components/Layout/UserMenu";
 const Profile = () => {
   return (
-    <div>Profile</div>
-  )
-}
+    <Layout>
+      <div className="container-fluid p-3 m-3">
+        <div className="row">
+          <div className="col-md-3">
+            <UserMenu />
+          </div>
+          <div className="col-md-9">
+            <h4>Profile</h4>
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+};
 
-export default Profile
+export default Profile;
