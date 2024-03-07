@@ -1,14 +1,13 @@
 const { hashPassword, comparePassword } = require("../helpers/authHelper");
 const { User } = require("../sequelize/models");
-const JWT = require("jsonwebtoken")
-
+const JWT = require("jsonwebtoken");
 
 // regsiter USER
 const registerController = async (req, res) => {
   try {
     const { name, email, password, phone, address } = req.body;
     if (!name) {
-      return res.send({ error: "Name is Required" });
+      return res.send({ message: "Name is Required" });
     }
     if (!email) {
       return res.send({ message: "Email is Required" });
@@ -25,15 +24,23 @@ const registerController = async (req, res) => {
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({
-        message: "User already exist",
+      return res.status(200).send({
+        success: false,
+        message: "Already Register please login",
       });
     }
     const hashedPassword = await hashPassword(password);
-    const user = await User.create({name, email, password:hashedPassword, phone, address});
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+      address,
+    });
     res.status(201).json({
+      success: true,
       message: "User Registered",
-      data: user,
+      user,
     });
   } catch (error) {
     console.log(error);
@@ -49,6 +56,7 @@ const registerController = async (req, res) => {
 const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log("email >>>>>" ,email);
     //validation
     if (!email || !password) {
       return res.status(404).send({
@@ -57,9 +65,10 @@ const loginController = async (req, res) => {
       });
     }
     //check user
-    const user = await User.findOne({ email });
+    const user = await User.findOne({where:{ email }});
+    console.log("user >>>>>>", user);
     if (!user) {
-      return res.status(404).send({
+      return res.status(404).json({
         success: false,
         message: "Email is not registerd",
       });
@@ -98,8 +107,32 @@ const loginController = async (req, res) => {
   }
 };
 
+// Get all USERS
+
+const getALlUsersController = async (req, res) => {
+  try {
+    const user = await User.findAll();
+    if (user != "") {
+      return res.status(200).json({
+        message: "Data Retrieved",
+        data: user,
+      });
+    } else {
+      return res.status(400).json({
+        message: "no user in the database",
+      });
+    }
+  } catch (error) {
+    console.log(err);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: err.message,
+    });
+  }
+};
 
 module.exports = {
   registerController,
-  loginController
+  loginController,
+  getALlUsersController,
 };

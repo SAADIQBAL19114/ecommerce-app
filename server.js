@@ -4,6 +4,7 @@ const dotenv = require("dotenv")
 const morgan = require("morgan")
 const authRoutes =require("./routes/authRoute.js")
 const { sequelize } = require("./sequelize/models");
+const cors = require("cors");
 
 // configure env
 dotenv.config();
@@ -12,6 +13,7 @@ dotenv.config();
 const app = express();
 
 // middlewares
+app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
