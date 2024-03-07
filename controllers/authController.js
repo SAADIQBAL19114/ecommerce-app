@@ -71,7 +71,7 @@ const loginController = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Email is not registerd",
+        message: "Invalid email or password",
       });
     }
     const match = await comparePassword(password, user.password);
