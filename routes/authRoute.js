@@ -15,7 +15,7 @@ const router = express.Router();
 router.post("/register", registerController);
 
 //LOGIN || POST
-router.post("/login", loginController);
+router.post("/login", loginController );
 
 // GET ALL USERS || GET
 router.get("/user", getALlUsersController);
