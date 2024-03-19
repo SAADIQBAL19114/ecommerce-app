@@ -16,14 +16,18 @@ const createProductController = async (req, res) => {
     if (!categoryId) {
       return res.send({ error: "categoryId is Required" });
     }
+
     const imageLocalPath = req.file?.path;
+    console.log("Helleo", req.file);
+    console.log("CategoryId", categoryId);
 
     if (!imageLocalPath) {
-      res.status(400).json({ message: "Image file is required" });
+      return res.status(400).json({ message: "Image file is required" });
     }
     const productImage = await uploadOnCloudinary(imageLocalPath);
+    console.log("Product Image", productImage);
     if (!productImage) {
-      res.status(400).json({ message: "Image file is required" });
+      return res.status(400).json({ message: "Image file is required ...." });
     }
     const product = await Product.create({
       name,
@@ -33,7 +37,8 @@ const createProductController = async (req, res) => {
       price,
       quantity,
     });
-    res.status(201).json({
+    res.status(201).send({
+      success: true,
       message: "Product created",
       data: {
         product,
@@ -51,11 +56,12 @@ const createProductController = async (req, res) => {
 
 const getAllProductController = async (req, res) => {
   try {
-    const product = await Product.findAll();
+    const product = await Product.findAll({ order: [["id", "ASC"]] });
     if (product != "") {
-      return res.status(200).json({
-        message: "Data Retrieved",
-        data: product,
+      return res.status(200).send({
+        success: true,
+        message: "All Products Recieved",
+        product,
       });
     } else {
       return res.status(400).json({
@@ -106,16 +112,12 @@ const deleteProductController = async (req, res) => {
 
     if (product.image) {
       await deleteFromCloudinary(product.image);
+      await product.destroy();
+      res.status(200).send({
+        success: true,
+        message: "Product Deleted Successfully",
+      });
     }
-
-    await product.destroy();
-
-    res.status(200).json({
-      message: "Product deleted successfully",
-      data: {
-        product: product,
-      },
-    });
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -148,19 +150,21 @@ const editProductController = async (req, res) => {
     if (!productImage) {
       res.status(400).json({ message: "Image file is required" });
     }
+
+    // product.categoryId= categoryId
     product.name = name;
     product.description = description;
     product.price = price;
     product.quantity = quantity;
     product.image = productImage.url;
 
-    product.save();
+    console.log("product??>>>>>>", product);
+    await product.save();
 
-    res.status(200).json({
+    res.status(201).send({
+      success: true,
       message: "Product updated",
-      data: {
-        product: product,
-      },
+      product,
     });
   } catch (error) {
     console.log(error);

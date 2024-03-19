@@ -1,4 +1,4 @@
-const express =require ("express")
+const express = require("express");
 const {
   createProductController,
   getAllProductController,
@@ -6,11 +6,11 @@ const {
   deleteProductController,
   editProductController,
 } = require("../controllers/productController.js");
-const {upload} = require("../middlewares/multer.middleware.js");
+const { upload } = require("../middlewares/multer.middleware.js");
 
 const router = express.Router();
 
-router.post("/create-product",upload.single("image"), createProductController);
+router.post("/create-product", upload.single("image"), createProductController);
 router.get("/all-product", getAllProductController);
 router.get("/get-product/:productId", getSingleProductController);
 router.delete("/delete-product/:productId", deleteProductController);
@@ -20,6 +20,4 @@ router.put(
   editProductController
 );
 
-
 module.exports = router;
-
