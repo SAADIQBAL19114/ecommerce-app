@@ -1,8 +1,10 @@
-const express = require ("express")
-const colors = require("colors")
-const dotenv = require("dotenv")
-const morgan = require("morgan")
-const authRoutes =require("./routes/authRoute.js")
+const express = require("express");
+const colors = require("colors");
+const dotenv = require("dotenv");
+const morgan = require("morgan");
+const authRoutes = require("./routes/authRoute.js");
+const productRoutes = require("./routes/productRoutes.js");
+const categoryRoutes = require("./routes/categoryRoute.js");
 const { sequelize } = require("./sequelize/models");
 
 // configure env
@@ -28,11 +30,13 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 8080;
 
 // listen
-app.listen(PORT, async() => {
+app.listen(PORT, async () => {
   console.log(
     `server is running on ${process.env.DEV_MODE} mode on port ${PORT}`.bgCyan
       .black
   );
-  await sequelize.authenticate()
-  console.log("Data base connected".bgRed .brightWhite);
+  await sequelize.sync({ alter: true });
+  console.log("All models were synchronized successfully.");
+  // await sequelize.authenticate()
+  // console.log("Data base connected".bgRed .brightWhite);
 });
