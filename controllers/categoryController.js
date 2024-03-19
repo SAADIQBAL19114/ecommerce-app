@@ -65,7 +65,7 @@ const updateCategroyController = async (req, res) => {
       });
     } else {
       category.name = name;
-      await category.save();
+      category.save();
       res.status(201).send({
         success: true,
         messsage: "Category Updated Successfully",
@@ -116,7 +116,7 @@ const deleteCategoryController = async (req, res) => {
         message: "please provide a valid id",
       });
     } else {
-      await category.destroy();
+      category.destroy();
       res.status(200).send({
         success: true,
         message: "Categry Deleted Successfully",
