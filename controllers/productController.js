@@ -33,11 +33,10 @@ const createProductController = async (req, res) => {
       price,
       quantity,
     });
-    res.status(201).json({
+    res.status(201).send({
+      success: true,
       message: "Product created",
-      data: {
-        product,
-      },
+      product,
     });
   } catch (error) {
     console.log(error);
@@ -53,9 +52,10 @@ const getAllProductController = async (req, res) => {
   try {
     const product = await Product.findAll();
     if (product != "") {
-      return res.status(200).json({
+      return res.status(200).send({
+        success: true,
         message: "Data Retrieved",
-        data: product,
+        product,
       });
     } else {
       return res.status(400).json({
@@ -111,10 +111,9 @@ const deleteProductController = async (req, res) => {
     await product.destroy();
 
     res.status(200).json({
+      success: true,
       message: "Product deleted successfully",
-      data: {
-        product: product,
-      },
+      product,
     });
   } catch (error) {
     console.error(error);
@@ -129,38 +128,42 @@ const deleteProductController = async (req, res) => {
 const editProductController = async (req, res) => {
   try {
     const { productId } = req.params;
-    const { name, description, price, quantity } = req.body;
+    const { name, description, price, quantity, categoryId } = req.body;
 
     const product = await Product.findOne({ where: { id: productId } });
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-    if (req.file) {
-      await deleteFromCloudinary(product.image);
-    }
     const imageLocalPath = req.file?.path;
+    if (imageLocalPath) {
+      if (req.file) {
+        await deleteFromCloudinary(product.image);
+      }
 
-    if (!imageLocalPath) {
-      res.status(400).json({ message: "Image file is required" });
+      if (!imageLocalPath) {
+        res.status(400).json({ message: "Image file is required" });
+      }
+      const productImage = await uploadOnCloudinary(imageLocalPath);
+      if (!productImage) {
+        res.status(400).json({ message: "Image file is required" });
+      }
+      product.image = productImage.url;
     }
-    const productImage = await uploadOnCloudinary(imageLocalPath);
-    if (!productImage) {
-      res.status(400).json({ message: "Image file is required" });
-    }
-    product.name = name;
-    product.description = description;
-    product.price = price;
-    product.quantity = quantity;
-    product.image = productImage.url;
+    if (name) product.name = name;
+    if (description) product.description = description;
+    if (price) product.price = price;
+    if (quantity) product.quantity = quantity;
+    if (categoryId) product.categoryId = categoryId;
 
-    product.save();
+    const resp = await product.save();
+    console.log("Resp", resp);
+    console.log("Product", product);
 
     res.status(200).json({
+      success: true,
       message: "Product updated",
-      data: {
-        product: product,
-      },
+      product,
     });
   } catch (error) {
     console.log(error);
