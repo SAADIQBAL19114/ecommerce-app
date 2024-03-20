@@ -48,7 +48,6 @@ const CreateProduct = () => {
     }
   };
   const getAllProducts = async () => {
-    console.log("selected>>>>>>>", selected);
     try {
       const { data } = await axios.get("/api/v1/product/all-product");
       if (data?.success) {
@@ -67,7 +66,7 @@ const CreateProduct = () => {
   };
 
   const onFinish = async () => {
-    console.log("inside OnFinish");
+    setLoading(true);
     try {
       const values = await form.validateFields();
       const productData = new FormData();
@@ -76,41 +75,40 @@ const CreateProduct = () => {
       productData.append("price", values.price);
       productData.append("quantity", values.quantity);
       productData.append("image", values.image[0].originFileObj);
-      productData.append("categoryId", values.category);
+      productData.append("categoryId", values.categoryId);
 
-      console.log("Product Data", productData);
       try {
-        setLoading(true);
         const { data } = await axios.post(
           "/api/v1/product/create-product",
           productData
         );
 
-        console.log("productData", productData);
         if (data?.success) {
           toast.success("Product Created Successfully");
-          setLoading(false);
           setAddProductVisible(false);
-          setReload(true);
+          setReload(!reload);
+          setLoading(false);
         } else {
           toast.error(data?.message);
+          setLoading(false);
         }
       } catch (error) {
+        setLoading(false);
         console.log(error);
         toast.error("something went wrong");
       }
-
-      console.log("Success:", values);
     } catch (error) {
       message.error("Validate Failed:", error);
     }
   };
   const compareValues = (product, formData) => {
     const updateProduct = {};
-    if (formData.image) {
+    if (formData.image && formData.image.length) {
       updateProduct.image = formData.image;
     }
-    const keys = Object.keys(product).filter((p) => p !== "image");
+    const keys = Object.keys(product).filter(
+      (p) => !["id", "image", "createdAt", "updatedAt"].includes(p)
+    );
     for (let i = 0; i < keys.length; i++) {
       if (product[keys[i]] !== formData[keys[i]]) {
         updateProduct[keys[i]] = formData[keys[i]];
@@ -121,50 +119,32 @@ const CreateProduct = () => {
   };
 
   const onFinishEdit = async (product) => {
-    console.log("inside OnFinisEdit");
-    console.log("selected", selected);
+    setLoading(true);
     try {
-      // const values = await form.validateFields();
-      // console.log(values);
-      // const updVals = compareValues(product, values);
-      // if (Object.keys(updVals).length === 0) {
-      //   return;
-      // }
-      // const { name, description, price, quantity, image, category } = updVals;
-      // const productData = new FormData();
-      // name && productData.append("name", name);
-      // description && productData.append("description", description);
-      // price && productData.append("price", price);
-      // quantity && productData.append("quantity", quantity);
-      // image && productData.append("image", image[0].originFileObj);
-      // category && productData.append("categoryId", values.category);
-
-      // console.log("Product Data", productData);
       const values = await form.validateFields();
-      const productData = new FormData();
-      productData.append("name", values.name);
-      productData.append("description", values.description);
-      productData.append("price", values.price);
-      productData.append("quantity", values.quantity);
-      values.image[0].originFileObj
-        ? productData.append("image", values.image[0].originFileObj)
-        : productData.append("image", values.image[0].originFileObj);
-      productData.append("categoryId", values.category);
 
-      console.log("Product Data", productData);
+      const updVals = compareValues(product, values);
+      if (Object.keys(updVals).length === 0) {
+        return;
+      }
+      const { name, description, price, quantity, image, categoryId } = updVals;
+      const productData = new FormData();
+      name && productData.append("name", name);
+      description && productData.append("description", description);
+      price && productData.append("price", price);
+      quantity && productData.append("quantity", quantity);
+      image && productData.append("image", image[0].originFileObj);
+      categoryId && productData.append("categoryId", categoryId);
       try {
-        setLoading(true);
         const { data } = await axios.put(
           `/api/v1/product/edit-product/${selected.id}`,
           productData
         );
-        setReload(true);
-        setLoading(false);
-        setEditProductVisible(false);
-        console.log("productData", productData);
         if (data?.success) {
           toast.success("Product Edited Successfully");
+          setReload(!reload);
           setLoading(false);
+          setEditProductVisible(false);
         } else {
           toast.error(data?.message);
         }
@@ -173,7 +153,6 @@ const CreateProduct = () => {
         toast.error("something went wrong");
       }
 
-      console.log("Success:", values);
       setSelected({});
     } catch (error) {
       message.error("Validate Failed:", error);
@@ -202,7 +181,7 @@ const CreateProduct = () => {
 
   useEffect(() => {
     getAllProducts();
-  }, []);
+  }, [reload]);
 
   return (
     <Layout>
@@ -216,7 +195,17 @@ const CreateProduct = () => {
             <button
               type="submit"
               className="btn btn-primary mb-4"
-              onClick={() => setAddProductVisible(true)}
+              onClick={() => {
+                setAddProductVisible(true);
+                form.resetFields([
+                  "name",
+                  "categoryId",
+                  "description",
+                  "price",
+                  "quantity",
+                  "image",
+                ]);
+              }}
             >
               Add Product
             </button>

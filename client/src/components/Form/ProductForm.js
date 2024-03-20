@@ -33,15 +33,15 @@ const ProductForm = ({
         setImageUrl(image);
       }
       // let imageFile;
+      form.resetFields(["image"]);
       form.setFieldsValue({
         name,
         description,
         price,
         quantity,
-        category: categoryId,
+        categoryId,
       });
     }
-    console.log(product);
   }, [isEdit]);
   return (
     <Modal
@@ -67,7 +67,7 @@ const ProductForm = ({
       >
         <Form.Item
           label="Category"
-          name={"category"}
+          name={"categoryId"}
           rules={[{ required: true, message: "Please Select the Category" }]}
           wrapperCol={{
             offset: 1,
@@ -143,10 +143,11 @@ const ProductForm = ({
           }}
         >
           <Upload
-            action="/upload"
             listType="picture-card"
             maxCount={1}
-            onChange={() => setImageUrl("")}
+            onChange={() => {
+              setImageUrl("");
+            }}
           >
             {imageUrl ? (
               <img src={imageUrl} alt="Product" style={{ width: "50%" }} />
