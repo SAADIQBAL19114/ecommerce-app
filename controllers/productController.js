@@ -1,4 +1,5 @@
 const { Product } = require("../sequelize/models");
+const { Op } = require("sequelize");
 const {
   uploadOnCloudinary,
   deleteFromCloudinary,
@@ -50,7 +51,7 @@ const createProductController = async (req, res) => {
 
 const getAllProductController = async (req, res) => {
   try {
-    const product = await Product.findAll();
+    const product = await Product.findAll({ order: [["id", "ASC"]] });
     if (product != "") {
       return res.status(200).send({
         success: true,
@@ -175,10 +176,44 @@ const editProductController = async (req, res) => {
   }
 };
 
+// filter controller
+
+const productFilerController = async (req, res) => {
+  try {
+    const { checked, radio } = req.body;
+    let where = {};
+    if (checked.length > 0) {
+      where.categoryId = checked;
+    }
+    if (radio.length) {
+      where.price = {
+        [Op.gte]: radio[0],
+        [Op.lte]: radio[1],
+      };
+    }
+    const products = await Product.findAll({
+      where,
+    });
+
+    res.status(200).send({
+      success: true,
+      products,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Error while filtering product",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createProductController,
   getAllProductController,
   getSingleProductController,
   deleteProductController,
   editProductController,
+  productFilerController,
 };
