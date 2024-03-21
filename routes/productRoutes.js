@@ -5,6 +5,7 @@ const {
   getSingleProductController,
   deleteProductController,
   editProductController,
+  productFilerController,
 } = require("../controllers/productController.js");
 const { upload } = require("../middlewares/multer.middleware.js");
 
@@ -19,5 +20,9 @@ router.put(
   upload.single("image"),
   editProductController
 );
+
+// Product Filter
+
+router.post("/product-filter",productFilerController);
 
 module.exports = router;
