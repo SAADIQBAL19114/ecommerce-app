@@ -15,12 +15,14 @@ import CreateProduct from "./pages/Admin/CreateProduct";
 import Users from "./pages/Admin/Users";
 import Profile from "./pages/user/Profile";
 import Orders from "./pages/user/Orders";
+import ProductDetails from "./pages/ProductDetails";
 
 function App() {
   return (
     <>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/dashboard" element={<Private />}>
           <Route path="user" element={<Dashboard />} />
           <Route path="user/profile" element={<Profile />} />
