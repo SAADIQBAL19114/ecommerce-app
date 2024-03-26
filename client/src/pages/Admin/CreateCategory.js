@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import CategoryForm from "../../components/Form/CategoryForm";
 import { Modal } from "antd";
+import Table from "../../components/Table";
 
 
 const CreateCategory = () => {
@@ -13,6 +14,7 @@ const CreateCategory = () => {
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(null);
   const [updatedName, setUpdatedName] = useState("");
+  const [fields, setFields] = useState([]);
 
   // Create Category
   const handleSubmit = async (e) => {
@@ -62,8 +64,9 @@ const CreateCategory = () => {
         `/api/v1/category/delete-category/${id}`
       );
       if (data.success) {
-        toast.success(`category is Deleted`);
+        console.log("first");
         getAllCategories();
+        toast.success(`category is Deleted`);
       } else {
         toast.error(data.message);
       }
@@ -88,6 +91,24 @@ const CreateCategory = () => {
   useEffect(() => {
     getAllCategories();
   }, []);
+  useEffect(() => {
+    setFields([
+      {
+        title: "Name",
+        dataIndex: "name",
+        type: "text",
+        require: true,
+        message: "Please Enter the Name",
+        onTable: true,
+      },
+      {
+        title: "Action",
+        dataIndex: "action",
+        type: "button",
+        onTable: true,
+      },
+    ]);
+  }, [categories]);
   return (
     <Layout>
       <div className="container-fluid m-3 p-3">
@@ -105,7 +126,15 @@ const CreateCategory = () => {
               />
             </div>
             <div className="w-75">
-              <table className="table">
+              <Table
+                data={categories}
+                setEditProductVisible={setVisible}
+                setUpdatedName={setUpdatedName}
+                setSelected={setSelected}
+                handleDelete={handleDelete}
+                formfields={fields}
+              />
+              {/* <table className="table">
                 <thead>
                   <tr>
                     <th scope="col">Name</th>
@@ -138,7 +167,7 @@ const CreateCategory = () => {
                       </tr>
                   ))}
                 </tbody>
-              </table>
+              </table> */}
             </div>
           </div>
           <Modal

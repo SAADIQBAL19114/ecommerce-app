@@ -1,21 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Layout from "../components/Layout/Layout.js";
 import { useAuth } from "../context/auth.js";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Checkbox, Radio } from "antd";
+import { useCart } from "../context/cart";
 import { Prices } from "../components/Prices.js";
+import "../styles/HomePage.css";
+import "../styles/ProductDetailsStyle.css";
 
 const HomePage = () => {
   // eslint-disable-next-line
   const navigate = useNavigate();
+  const [cart, setCart] = useCart();
   const [auth, setAuth] = useAuth();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [checked, setChecked] = useState([]);
+  const [checkBoxState, setCheckBoxState] = useState(true);
   const [radio, setRadio] = useState([]);
   const [search, setSearch] = useState("");
+  const checkboxRef = useRef(null);
 
   const getAllProducts = async () => {
     try {
@@ -33,8 +39,8 @@ const HomePage = () => {
   const getAllCategories = async () => {
     try {
       const { data } = await axios.get("/api/v1/category/all-category");
-      if (data.success) {
-        setCategories(data.category);
+      if (data?.success) {
+        setCategories(data?.category);
       }
     } catch (error) {
       console.log(error);
@@ -53,6 +59,16 @@ const HomePage = () => {
     setChecked(all);
   };
 
+  // reset filter
+  const resetFilter = () => {
+    // checkboxRef.current.unchecked;
+    setChecked([]);
+    setCheckBoxState(false);
+    setRadio([]);
+    setSearch("");
+    // getAllProducts();
+  };
+
   useEffect(() => {
     getAllCategories();
   }, []);
@@ -60,6 +76,7 @@ const HomePage = () => {
   useEffect(() => {
     if (!checked.length && !radio.length) getAllProducts();
   }, [checked.length, radio.length]);
+
   useEffect(() => {
     if (checked.length || radio.length) {
       const filterProduct = async () => {
@@ -90,6 +107,10 @@ const HomePage = () => {
             {categories?.map((c) => (
               <label key={c.id} className="checkbox-label">
                 <Checkbox
+                  // ref={checkboxRef}
+                  // value={checked}
+                  // defaultChecked={checkBoxState}
+                  checked={!checkBoxState}
                   onChange={(e) => handleFilter(e.target.checked, c.id)}
                 />
                 <span className="checkbox-text">{c.name}</span>
@@ -107,10 +128,7 @@ const HomePage = () => {
             </Radio.Group>
           </div>
           <div className="d-flex flex-column p-4">
-            <button
-              className="btn btn-danger"
-              onClick={() => window.location.reload()}
-            >
+            <button className="btn btn-danger" onClick={resetFilter}>
               Reset Filters
             </button>
           </div>
@@ -145,57 +163,108 @@ const HomePage = () => {
           <div className="d-flex flex-wrap">
             {search === ""
               ? products?.map((p) => (
-                  <div className="card m-2" style={{ width: "18rem" }}>
-                    <div>
-                      <img
-                        src={`${p.image}`}
-                        className="card-img-top w-100"
-                        style={{
-                          objectFit: "contain",
-                          maxHeight: "200px",
-                          padding: "10px",
-                        }}
-                        alt={p.name}
-                      />
-                    </div>
+                  <div
+                    className="card m-2"
+                    style={{ width: "18rem" }}
+                    key={p.id}
+                  >
+                    <img
+                      src={`${p.image}`}
+                      className="card-img-top w-100"
+                      style={{
+                        objectFit: "contain",
+                        maxHeight: "200px",
+                        padding: "10px",
+                      }}
+                      alt={p.name}
+                    />
                     <div className="card-body">
-                      <h5 className="card-title">{p.name}</h5>
-                      <p className="card-text">{p.description}</p>
-                      <p className="card-text">$ {p.price}</p>
-                      <button
-                        class="btn btn-primary ms-1"
-                        onClick={() => navigate(`/product/${p.id}`)}
-                      >
-                        More Details
-                      </button>
-                      <button class="btn btn-secondary ms-1">
-                        Add to Cart
-                      </button>
+                      <div className="card-name-price">
+                        <h5 className="card-title">{p.name}</h5>
+                        <h5 className="card-title card-price">
+                          {p.price.toLocaleString("en-US", {
+                            style: "currency",
+                            currency: "USD",
+                          })}
+                        </h5>
+                      </div>
+                      <p className="card-text ">
+                        {p.description.substring(0, 60)}...
+                      </p>
+                      <div className="card-name-price">
+                        <button
+                          className="btn btn-info ms-1"
+                          onClick={() => navigate(`/product/${p.id}`)}
+                        >
+                          More Details
+                        </button>
+                        <button
+                          class="btn btn-secondary"
+                          onClick={() => {
+                            setCart([...cart, p]);
+                            localStorage.setItem(
+                              "cart",
+                              JSON.stringify([...cart, p])
+                            );
+                            toast.success("Item Added to cart");
+                          }}
+                        >
+                          Add to Cart
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))
               : filteredProducts?.map((p) => (
-                  <div className="card m-2" style={{ width: "18rem" }}>
-                    <div>
-                      <img
-                        src={`${p.image}`}
-                        className="card-img-top w-100"
-                        style={{
-                          objectFit: "contain",
-                          maxHeight: "200px",
-                          padding: "10px",
-                        }}
-                        alt={p.name}
-                      />
-                    </div>
+                  <div
+                    className="card m-2"
+                    style={{ width: "18rem" }}
+                    key={p.id}
+                  >
+                    <img
+                      src={`${p.image}`}
+                      className="card-img-top w-100"
+                      style={{
+                        objectFit: "contain",
+                        maxHeight: "200px",
+                        padding: "10px",
+                      }}
+                      alt={p.name}
+                    />
                     <div className="card-body">
-                      <h5 className="card-title">{p.name}</h5>
-                      <p className="card-text">{p.description}</p>
-                      <p className="card-text">$ {p.price}</p>
-                      <button class="btn btn-primary ms-1">More Details</button>
-                      <button class="btn btn-secondary ms-1">
-                        Add to Cart
-                      </button>
+                      <div className="card-name-price">
+                        <h5 className="card-title">{p.name}</h5>
+                        <h5 className="card-title card-price">
+                          {p.price.toLocaleString("en-US", {
+                            style: "currency",
+                            currency: "USD",
+                          })}
+                        </h5>
+                      </div>
+                      <p className="card-text ">
+                        {p.description.substring(0, 60)}...
+                      </p>
+                      <div className="card-name-price">
+                        <button
+                          className="btn btn-info ms-1"
+                          onClick={() => navigate(`/product/${p.id}`)}
+                        >
+                          More Details
+                        </button>
+                        <button
+                          class="btn btn-secondary"
+                          onClick={() => {
+                            setCart([...cart, p]);
+                            localStorage.setItem(
+                              "cart",
+                              JSON.stringify([...cart, p])
+                            );
+                            toast.success("Item Added to cart");
+                          }}
+                        >
+                          Add to Cart
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}

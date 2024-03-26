@@ -3,36 +3,22 @@ import Layout from "../../components/Layout/Layout";
 import AdminMenu from "../../components/Layout/AdminMenu";
 import { toast } from "react-toastify";
 import axios from "axios";
-import {
-  Select,
-  Form,
-  Input,
-  InputNumber,
-  Upload,
-  message,
-  Button,
-  Modal,
-} from "antd";
-import { useNavigate } from "react-router-dom";
-import { PlusOutlined } from "@ant-design/icons";
+import { Form } from "antd";
 import ProductForm from "../../components/Form/ProductForm";
 import Table from "../../components/Table";
 
-const { Option } = Select;
 const CreateProduct = () => {
-  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
-  const [category, setCategory] = useState("");
-  const [product, setProduct] = useState("");
-  const [image, setmage] = useState("");
+
   const [loading, setLoading] = useState(false);
-  const { TextArea } = Input;
+
   const [form] = Form.useForm();
   const [addProductVisible, setAddProductVisible] = useState(false);
   const [editProductVisible, setEditProductVisible] = useState(false);
   const [selected, setSelected] = useState({});
   const [reload, setReload] = useState(false);
+  const [fields, setFields] = useState([]);
 
   // get all categories
 
@@ -98,7 +84,7 @@ const CreateProduct = () => {
         toast.error("something went wrong");
       }
     } catch (error) {
-      message.error("Validate Failed:", error);
+      toast.error("Validate Failed:", error);
     }
   };
   const compareValues = (product, formData) => {
@@ -155,7 +141,7 @@ const CreateProduct = () => {
 
       setSelected({});
     } catch (error) {
-      message.error("Validate Failed:", error);
+      toast.error("Validate Failed:", error);
     }
   };
 
@@ -178,6 +164,66 @@ const CreateProduct = () => {
   useEffect(() => {
     getAllCategories();
   }, []);
+  useEffect(() => {
+    setFields([
+      {
+        title: "Category",
+        dataIndex: "categoryId",
+        type: "select",
+        data: categories,
+        dataTitle: "name",
+        require: true,
+        message: "Please Select the Category",
+        onTable: false,
+      },
+      {
+        title: "Name",
+        dataIndex: "name",
+        type: "text",
+        require: true,
+        message: "Please Enter the Name",
+        onTable: true,
+      },
+      {
+        title: "Description",
+        dataIndex: "description",
+        type: "textArea",
+        require: true,
+        message: "Please Enter the Description",
+        onTable: false,
+      },
+      {
+        title: "Price",
+        dataIndex: "price",
+        type: "number",
+        require: true,
+        message: "Please Enter the Price",
+        onTable: true,
+      },
+      {
+        title: "Quantity",
+        dataIndex: "quantity",
+        type: "number",
+        require: true,
+        message: "Please Enter the Quantity",
+        onTable: true,
+      },
+      {
+        title: "Image",
+        dataIndex: "image",
+        type: "image",
+        require: true,
+        message: "Please add an image",
+        onTable: true,
+      },
+      {
+        title: "Action",
+        dataIndex: "action",
+        type: "button",
+        onTable: true,
+      },
+    ]);
+  }, [categories]);
 
   useEffect(() => {
     getAllProducts();
@@ -191,7 +237,7 @@ const CreateProduct = () => {
             <AdminMenu />
           </div>
           <div className="col-md-9">
-            <h1>Create Products</h1>
+            <h1>Manage Products</h1>
             <button
               type="submit"
               className="btn btn-primary mb-4"
@@ -211,35 +257,38 @@ const CreateProduct = () => {
             </button>
             <div className="w-75">
               <Table
-                products={products}
+                data={products}
                 setEditProductVisible={setEditProductVisible}
                 setSelected={setSelected}
                 handleDelete={handleDelete}
+                formfields={fields}
               />
             </div>
 
             <ProductForm
               onFinish={onFinish}
-              categories={categories}
               normFile={normFile}
               loading={loading}
               form={form}
-              product={selected}
+              entry={selected}
               isEdit={addProductVisible}
               setEdit={setAddProductVisible}
               setProduct={setSelected}
+              formFields={fields}
+              formOpt={"create"}
             />
 
             <ProductForm
               onFinish={onFinishEdit}
-              categories={categories}
               normFile={normFile}
               loading={loading}
               form={form}
-              product={selected}
+              entry={selected}
               isEdit={editProductVisible}
               setEdit={setEditProductVisible}
               setProduct={setSelected}
+              formFields={fields}
+              formOpt={"edit"}
             />
           </div>
         </div>
