@@ -16,6 +16,7 @@ import Users from "./pages/Admin/Users";
 import Profile from "./pages/user/Profile";
 import Orders from "./pages/user/Orders";
 import ProductDetails from "./pages/ProductDetails";
+import CartPage from "./pages/CartPage";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/cart" element={<CartPage />} />
         <Route path="/dashboard" element={<Private />}>
           <Route path="user" element={<Dashboard />} />
           <Route path="user/profile" element={<Profile />} />
