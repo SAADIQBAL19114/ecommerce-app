@@ -6,6 +6,7 @@ const {
   deleteProductController,
   editProductController,
   productFilerController,
+  relatedProductController,
 } = require("../controllers/productController.js");
 const { upload } = require("../middlewares/multer.middleware.js");
 
@@ -24,5 +25,21 @@ router.put(
 // Product Filter
 
 router.post("/product-filter", productFilerController);
+
+// Realted Product
+
+router.get("/related-product/:pid/:cid", relatedProductController);
+
+// router.get("/related-product/:cid/:pid", async (req, res) => {
+//   try {
+//     const { pid, cid } = req.params;
+//     console.log(pid, cid);
+//     if (cid === 18 && pid === 9) {
+//       res.json("console.log");
+//     }
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
 
 module.exports = router;

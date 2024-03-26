@@ -1,4 +1,4 @@
-const { Product } = require("../sequelize/models");
+const { Product, Category } = require("../sequelize/models");
 const { Op } = require("sequelize");
 const {
   uploadOnCloudinary,
@@ -75,11 +75,16 @@ const getAllProductController = async (req, res) => {
 const getSingleProductController = async (req, res) => {
   try {
     const { productId } = req.params;
-    const product = await Product.findOne({ where: { id: productId } });
+    let product = await Product.findOne({ where: { id: productId } });
+    let category = await Category.findOne({
+      where: { id: product.categoryId },
+    });
+    product.dataValues.category = category.name;
     if (product != "") {
       return res.status(200).json({
+        success: true,
         message: "Data Retrieved",
-        data: product,
+        product,
       });
     } else {
       return res.status(400).json({
@@ -209,6 +214,34 @@ const productFilerController = async (req, res) => {
   }
 };
 
+// related Product
+
+const relatedProductController = async (req, res) => {
+  console.log("in related product controller???????????");
+  try {
+    const { pid, cid } = req.params;
+    console.log("first", pid, cid);
+    const products = await Product.findAll({
+      where: {
+        categoryId: cid,
+        id: { [Op.ne]: pid },
+      },
+      limit: 3,
+    });
+    res.status(200).send({
+      success: true,
+      products,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Error while getting related product",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createProductController,
   getAllProductController,
@@ -216,4 +249,5 @@ module.exports = {
   deleteProductController,
   editProductController,
   productFilerController,
+  relatedProductController,
 };
