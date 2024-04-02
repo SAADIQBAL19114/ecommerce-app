@@ -20,4 +20,13 @@ router.put(
   editProductController
 );
 
+// Product Filter
+
+router.post("/product-filter", productFilerController);
+
+// Realted Product
+
+router.get("/related-product/:pid/:cid", relatedProductController);
+
+
 module.exports = router;

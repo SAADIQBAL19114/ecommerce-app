@@ -100,8 +100,111 @@ const loginController = async (req, res) => {
   }
 };
 
+// Get all USERS
+
+const getALlUsersController = async (req, res) => {
+  try {
+    const user = await User.findAll();
+    if (user != "") {
+      return res.status(200).json({
+        success:true,
+        message: "Data Retrieved",
+        user,
+      });
+    } else {
+      return res.status(400).json({
+        message: "no user in the database",
+      });
+    }
+  } catch (error) {
+    console.log(err);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: err.message,
+    });
+  }
+};
+
+// edit USER
+
+const editUserController = async (req, res) => {
+  try {
+    const { name, password, phone, address } = req.body;
+    const {userId} = req.params
+
+
+    const user = await User.findOne({where:{id:userId}});
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    
+    if(password === ""){
+      user.name = name,
+      user.phone = phone,
+      user.address = address
+      
+      await user.save()
+    }else{
+    const hashedPassword = await hashPassword(password);
+    
+      user.name = name,
+      user.password = hashedPassword,
+      user.phone = phone,
+      user.address = address,
+
+      await user.save()
+    }
+    res.status(200).json({
+      success: true,
+      message: "User information updated successfully",
+      user,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Error in updating user information",
+      error: error.message,
+    });
+  }
+};
+
+// Delete USER
+
+const deleteUserController = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "user not found" });
+    }
+
+    await user.destroy();
+
+    res.status(200).json({
+      success: true,
+      message: "user deleted successfully",
+      user,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Error in deleting user",
+      error: error.message,
+    });
+  }
+};
 
 module.exports = {
   registerController,
-  loginController
+  loginController,
+  getALlUsersController,
+  editUserController,
+  deleteUserController,
 };

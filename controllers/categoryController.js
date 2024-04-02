@@ -33,6 +33,7 @@ const createCategroyController = async (req, res) => {
 const getAllCategories = async (req, res) => {
   try {
     const category = await Category.findAll();
+    console.log('Categories',category);
     if (category != "") {
       return res.status(200).send({
         success: true,
