@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
 const Table = ({
   data,
@@ -7,9 +8,11 @@ const Table = ({
   handleDelete,
   formfields,
   setUpdatedName,
+  setOpenDeleteModal,
+  setDeleteId,
 }) => {
   return (
-    <table className="table">
+    <table className="table text-center">
       <thead>
         <tr key={0}>
           {formfields
@@ -37,16 +40,21 @@ const Table = ({
                   return (
                     <td
                       key={index + i + 1}
-                      className="d-flex"
+                      className=""
                       style={{
                         maxWidth: "100px",
                         maxHeight: "100px",
+                        position: "relative",
                       }}
                     >
                       {
                         <img
                           src={`${p[ff.dataIndex]}`}
-                          className="w-100 object-fit-contain"
+                          className="object-fit-contain"
+                          style={{
+                            width: "80px",
+                            height: "70px",
+                          }}
                         />
                       }
                     </td>
@@ -54,22 +62,23 @@ const Table = ({
                 }
                 return (
                   <td key={index + i + 1}>
-                    <button
-                      className="btn btn-primary ms-2"
-                      onClick={() => {
-                        setEditProductVisible(true);
-                        setSelected(p);
-                        setUpdatedName && setUpdatedName(p.name);
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-danger ms-2"
-                      onClick={() => handleDelete(p.id)}
-                    >
-                      Delete
-                    </button>
+                    <div className="action-icons">
+                      <EditOutlined
+                        onClick={() => {
+                          setEditProductVisible(true);
+                          setSelected(p);
+                          setUpdatedName && setUpdatedName(p.name);
+                        }}
+                      />
+
+                      <DeleteOutlined
+                        onClick={() => {
+                          setOpenDeleteModal(true);
+                          setDeleteId(p.id);
+                          // console.log("deleteId", deleteId);
+                        }}
+                      />
+                    </div>
                   </td>
                 );
               })}
