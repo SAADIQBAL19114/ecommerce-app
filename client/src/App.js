@@ -10,13 +10,14 @@ import Dashboard from "./pages/user/Dashboard";
 import Private from "./components/Routes/Private";
 import AdminRoute from "./components/Routes/AdminRoute";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
-import CreateCategory from "./pages/Admin/CreateCategory";
-import CreateProduct from "./pages/Admin/CreateProduct";
+import CreateCategory from "./pages/Admin/Category";
+import CreateProduct from "./pages/Admin/Product";
 import Users from "./pages/Admin/Users";
 import Profile from "./pages/user/Profile";
 import Orders from "./pages/user/Orders";
 import ProductDetails from "./pages/ProductDetails";
 import CartPage from "./pages/CartPage";
+import "./App.css";
 
 function App() {
   return (

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Select, Form, Input, InputNumber, Upload, Button, Modal } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
+import Password from "antd/es/input/Password";
 
 const ProductForm = ({
   onFinish,
@@ -16,7 +17,6 @@ const ProductForm = ({
 }) => {
   const { TextArea } = Input;
   const [imageUrl, setImageUrl] = useState("");
-
   useEffect(() => {
     const { image } = entry;
     const resetFields = Object.keys(entry)
@@ -31,6 +31,7 @@ const ProductForm = ({
     if (formOpt === "create") {
       setImageUrl("");
     }
+    
     if (Object.keys(entry).length) {
       if (image) {
         setImageUrl(image);
@@ -109,34 +110,43 @@ const ProductForm = ({
                 </Upload>
               </Form.Item>
             ) : (
-              <Form.Item
-                label={ff.title}
-                name={ff.dataIndex}
-                rules={
-                  ff.required ? [{ required: true, message: ff.message }] : []
-                }
-                wrapperCol={{
-                  offset: 1,
-                  span: 16,
-                }}
-              >
-                {ff.type === "select" ? (
-                  <Select>
-                    {ff.data &&
-                      ff.data.map((val, index) => (
-                        <Select.Option key={index} value={val.id}>
-                          {val[ff.dataTitle]}
-                        </Select.Option>
-                      ))}
-                  </Select>
-                ) : ff.type === "text" ? (
-                  <Input />
-                ) : ff.type === "number" ? (
-                  <InputNumber />
-                ) : (
-                  <TextArea rows={4} />
+              <>
+                {ff.title == "Role" ? null : (
+                  <Form.Item
+                    label={ff.title}
+                    name={ff.dataIndex}
+                    rules={
+                      ff.required
+                        ? [{ required: true, message: ff.message }]
+                        : []
+                    }
+                    wrapperCol={{
+                      offset: 1,
+                      span: 16,
+                    }}
+                  >
+                    {ff.type === "select" ? (
+                      <Select>
+                        {ff.data &&
+                          ff.data.map((val, index) => (
+                            <Select.Option key={index} value={val.id}>
+                              {val[ff.dataTitle]}
+                            </Select.Option>
+                          ))}
+                      </Select>
+                    ) : ff.formOpt === "edit" &&
+                      ff.dataIndex == "email" ? null : ff.type === "text" && ff.formOpt !== "edit" ? (
+                      <Input />
+                    ) : ff.type === "number" ? (
+                      <InputNumber />
+                    ) : ff.type === "password" ? (
+                      <Password />
+                    ) : ff.type === "textArea" ? (
+                      <TextArea rows={4} />
+                    ) : null}
+                  </Form.Item>
                 )}
-              </Form.Item>
+              </>
             );
           })
           .filter(Boolean)}

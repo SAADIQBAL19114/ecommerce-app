@@ -3,6 +3,8 @@ const {
   registerController,
   loginController,
   getALlUsersController,
+  editUserController,
+  deleteUserController,
 } = require("../controllers/authController.js");
 const { requireSignIn, isAdmin } = require("../middlewares/authMiddleware.js");
 
@@ -19,6 +21,12 @@ router.post("/login", loginController );
 
 // GET ALL USERS || GET
 router.get("/user", getALlUsersController);
+
+// EDIT USER || PUT
+router.put("/edit-user/:userId", editUserController);
+
+// DELETE USER || DELETE
+router.delete("/delete-user/:userId", deleteUserController);
 
 // test route
 router.get("/test", requireSignIn, isAdmin, (req, res) => {

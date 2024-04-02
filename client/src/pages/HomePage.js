@@ -81,6 +81,7 @@ const HomePage = () => {
     if (checked.length || radio.length) {
       const filterProduct = async () => {
         try {
+          //const { data } = await axios.post(`/api/v1/product/product-filter?category`)
           const { data } = await axios.post("/api/v1/product/product-filter", {
             checked,
             radio,
@@ -110,7 +111,7 @@ const HomePage = () => {
                   // ref={checkboxRef}
                   // value={checked}
                   // defaultChecked={checkBoxState}
-                  checked={!checkBoxState}
+                  checked={checked.includes(c.id)}
                   onChange={(e) => handleFilter(e.target.checked, c.id)}
                 />
                 <span className="checkbox-text">{c.name}</span>
@@ -119,12 +120,17 @@ const HomePage = () => {
           </div>
           <h4 className="text-center">Filter By Price</h4>
           <div className="d-flex flex-column p-4">
-            <Radio.Group onChange={(e) => setRadio(e.target.value)}>
-              {Prices?.map((p) => (
-                <div key={p.id}>
-                  <Radio value={p.array}>{p.name}</Radio>
-                </div>
-              ))}
+            <Radio.Group
+              options={Prices.map((p) => {
+                return { label: p.name, value: p.array };
+              })}
+              onChange={(e) => {
+                console.log(e.target);
+                setRadio(e.target.value);
+              }}
+              value={radio}
+            >
+            
             </Radio.Group>
           </div>
           <div className="d-flex flex-column p-4">
@@ -199,7 +205,7 @@ const HomePage = () => {
                           More Details
                         </button>
                         <button
-                          class="btn btn-secondary"
+                          className="btn btn-secondary"
                           onClick={() => {
                             setCart([...cart, p]);
                             localStorage.setItem(
@@ -252,7 +258,7 @@ const HomePage = () => {
                           More Details
                         </button>
                         <button
-                          class="btn btn-secondary"
+                          className="btn btn-secondary"
                           onClick={() => {
                             setCart([...cart, p]);
                             localStorage.setItem(
