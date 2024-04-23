@@ -11,7 +11,6 @@ import "../styles/HomePage.css";
 import "../styles/ProductDetailsStyle.css";
 
 const HomePage = () => {
-  // eslint-disable-next-line
   const navigate = useNavigate();
   const [cart, setCart] = useCart();
   const [auth, setAuth] = useAuth();
@@ -21,7 +20,8 @@ const HomePage = () => {
   const [checkBoxState, setCheckBoxState] = useState(true);
   const [radio, setRadio] = useState([]);
   const [search, setSearch] = useState("");
-  const checkboxRef = useRef(null);
+  const [disabledButtons, setDisabledButtons] = useState({});
+
 
   const getAllProducts = async () => {
     try {
@@ -69,6 +69,19 @@ const HomePage = () => {
     // getAllProducts();
   };
 
+  const addToCart =async(pId) => {
+    try {
+      const {data} = await axios.post(`/api/v1/cart/add-to-cart/${pId}/${auth.user.id}`);
+      if (data?.success) {
+        toast.success("Item Added to cart");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong in getting Products");
+    }
+    
+  };
+
   useEffect(() => {
     getAllCategories();
   }, []);
@@ -81,7 +94,6 @@ const HomePage = () => {
     if (checked.length || radio.length) {
       const filterProduct = async () => {
         try {
-          //const { data } = await axios.post(`/api/v1/product/product-filter?category`)
           const { data } = await axios.post("/api/v1/product/product-filter", {
             checked,
             radio,
@@ -108,9 +120,6 @@ const HomePage = () => {
             {categories?.map((c) => (
               <label key={c.id} className="checkbox-label">
                 <Checkbox
-                  // ref={checkboxRef}
-                  // value={checked}
-                  // defaultChecked={checkBoxState}
                   checked={checked.includes(c.id)}
                   onChange={(e) => handleFilter(e.target.checked, c.id)}
                 />
@@ -129,9 +138,7 @@ const HomePage = () => {
                 setRadio(e.target.value);
               }}
               value={radio}
-            >
-            
-            </Radio.Group>
+            ></Radio.Group>
           </div>
           <div className="d-flex flex-column p-4">
             <button className="btn btn-danger" onClick={resetFilter}>
@@ -206,14 +213,8 @@ const HomePage = () => {
                         </button>
                         <button
                           className="btn btn-secondary"
-                          onClick={() => {
-                            setCart([...cart, p]);
-                            localStorage.setItem(
-                              "cart",
-                              JSON.stringify([...cart, p])
-                            );
-                            toast.success("Item Added to cart");
-                          }}
+                          onClick={() => addToCart(p.id)}
+                          disabled={disabledButtons[p.id]}
                         >
                           Add to Cart
                         </button>
@@ -259,14 +260,8 @@ const HomePage = () => {
                         </button>
                         <button
                           className="btn btn-secondary"
-                          onClick={() => {
-                            setCart([...cart, p]);
-                            localStorage.setItem(
-                              "cart",
-                              JSON.stringify([...cart, p])
-                            );
-                            toast.success("Item Added to cart");
-                          }}
+                          onClick={() => addToCart(p)}
+                          disabled={disabledButtons[p.id]}
                         >
                           Add to Cart
                         </button>

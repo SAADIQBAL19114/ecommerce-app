@@ -13,7 +13,6 @@ const Users = () => {
   const [users, setUsers] = useState([]);
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const [form] = Form.useForm();
   const [addProductVisible, setAddProductVisible] = useState(false);
   const [editProductVisible, setEditProductVisible] = useState(false);
@@ -23,9 +22,21 @@ const Users = () => {
   const [fieldsEdit, setFieldsEdit] = useState([]);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState("");
-   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const onFinish = async () => {
+  const getSelected = (val) => {
+    const keys = Object.keys(val);
+    let updVal = { ...val };
+    if (
+      keys.length > 0 &&
+      keys.includes("password") &&
+      val["password"].length > 0
+    ) {
+      updVal = { ...updVal, password: "" };
+    }
+    return updVal;
+  };
+  const onFinish = async (values) => {
     setLoading(true);
     try {
       const values = await form.validateFields();
@@ -68,7 +79,7 @@ const Users = () => {
     }
   };
 
-  const onFinishEdit = async () => {
+  const onFinishEdit = async (values) => {
     setLoading(true);
     try {
       const values = await form.validateFields();
@@ -123,9 +134,7 @@ const Users = () => {
   const handleDelete = async (id) => {
     setDeleteLoading(true);
     try {
-      const { data } = await axios.delete(
-        `/api/v1/auth/delete-user/${id}`
-      );
+      const { data } = await axios.delete(`/api/v1/auth/delete-user/${id}`);
       if (data.success) {
         toast.success(`User is Deleted`);
         setDeleteLoading(false);
@@ -144,7 +153,7 @@ const Users = () => {
 
   useEffect(() => {
     getAllUsers();
-  }, []);
+  }, [reload]);
 
   useEffect(() => {
     setFields([
@@ -281,7 +290,7 @@ const Users = () => {
                 // normFile={normFile}
                 loading={loading}
                 form={form}
-                entry={selected}
+                entry={{}}
                 isEdit={addProductVisible}
                 setEdit={setAddProductVisible}
                 setProduct={setSelected}
@@ -293,7 +302,7 @@ const Users = () => {
                 // normFile={normFile}
                 loading={loading}
                 form={form}
-                entry={{ ...selected, password: "" }}
+                entry={selected}
                 isEdit={editProductVisible}
                 setEdit={setEditProductVisible}
                 setProduct={setSelected}

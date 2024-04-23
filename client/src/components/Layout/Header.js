@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useCart } from "../../context/cart";
 import { Badge } from "antd";
 
-const Header = () => {
+const Header = ({ productLength }) => {
   const [auth, setAuth] = useAuth();
   const [cart] = useCart();
 
@@ -97,7 +97,7 @@ const Header = () => {
               )}
               <li className="nav-item">
                 <NavLink to="/cart" className="nav-link">
-                  <Badge count={cart?.length} showZero offset={[10, -5]}>
+                  <Badge count={cart.length} showZero offset={[10, -5]}>
                     Cart
                   </Badge>
                 </NavLink>
