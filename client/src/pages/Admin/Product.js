@@ -233,7 +233,7 @@ const CreateProduct = () => {
         onTable: true,
       },
     ]);
-  }, [products]);
+  }, [products,categories]);
 
   useEffect(() => {
     getAllProducts();

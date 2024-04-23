@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Select, Form, Input, InputNumber, Upload, Button, Modal } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import Password from "antd/es/input/Password";
 
 const ProductForm = ({
   onFinish,
@@ -31,7 +30,7 @@ const ProductForm = ({
     if (formOpt === "create") {
       setImageUrl("");
     }
-    
+
     if (Object.keys(entry).length) {
       if (image) {
         setImageUrl(image);
@@ -135,12 +134,13 @@ const ProductForm = ({
                           ))}
                       </Select>
                     ) : ff.formOpt === "edit" &&
-                      ff.dataIndex == "email" ? null : ff.type === "text" && ff.formOpt !== "edit" ? (
+                      ff.dataIndex == "email" ? null : ff.type === "text" &&
+                      ff.formOpt !== "edit" ? (
                       <Input />
                     ) : ff.type === "number" ? (
                       <InputNumber />
                     ) : ff.type === "password" ? (
-                      <Password />
+                      <Input.Password />
                     ) : ff.type === "textArea" ? (
                       <TextArea rows={4} />
                     ) : null}
