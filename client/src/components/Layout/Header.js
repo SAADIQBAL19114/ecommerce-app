@@ -7,7 +7,7 @@ import { Badge } from "antd";
 
 const Header = ({ productLength }) => {
   const [auth, setAuth] = useAuth();
-  const [cart] = useCart();
+  const [cart, setCart] = useCart();
 
   const handleLogout = () => {
     setAuth({
@@ -15,6 +15,9 @@ const Header = ({ productLength }) => {
       user: null,
       token: "",
     });
+    setCart(
+      cart.length = 0
+    )
     localStorage.removeItem("auth");
     toast.success("Logout Successfully");
   };
@@ -97,7 +100,7 @@ const Header = ({ productLength }) => {
               )}
               <li className="nav-item">
                 <NavLink to="/cart" className="nav-link">
-                  <Badge count={cart.length} showZero offset={[10, -5]}>
+                  <Badge count={cart?.length} showZero offset={[10, -5]}>
                     Cart
                   </Badge>
                 </NavLink>
