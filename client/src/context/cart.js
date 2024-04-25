@@ -5,21 +5,22 @@ import { useAuth } from "../context/auth";
 
 const CartContext = createContext();
 const CartProvider = ({ children }) => {
-  const [auth,setAuth] = useAuth()
+  const [auth, setAuth] = useAuth();
   const [cart, setCart] = useState([]);
 
   useEffect(() => {
     const addToCart = async () => {
-      try {
-        console.log(auth.user.id);
-        const { data } = await axios.get(`/api/v1/cart/get/${auth.user.id}`);
-        if (data?.success) {
-          const newV = data.cartItems.map((item) => item.Product);
-          setCart(newV);
+      if (auth.user) {
+        try {
+          console.log(auth.user.id);
+          const { data } = await axios.get(`/api/v1/cart/get/${auth.user.id}`);
+          if (data?.success) {
+            const newV = data.cartItems;
+            setCart(newV);
+          }
+        } catch (error) {
+          console.error(error);
         }
-      } catch (error) {
-        console.error(error);
-        toast.error("Something went wrong in getting the cart items");
       }
     };
     addToCart();

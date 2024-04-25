@@ -11,14 +11,44 @@ const CartPage = () => {
   const [auth, setAuth] = useAuth();
   const [cart, setCart] = useCart();
   const [quantities, setQuantities] = useState({});
-  const [product, setProduct] = useState([]);
+  const [maxQuantities, setMaxQuantities] = useState({});
+
+  const products = cart?.map((item) => item.Product);
+
+  const fetchMaxQuantities = async () => {
+    try {
+      const { data } = await axios.get("/api/v1/product/all-product");
+      const maxQuantitiesData = {};
+      console.log(data);
+      data.product.forEach((product) => {
+        maxQuantitiesData[product.id] = product.quantity;
+      });
+      setMaxQuantities(maxQuantitiesData);
+      console.log("maxQuantitiesData", maxQuantitiesData);
+    } catch (error) {
+      console.error("Error fetching maximum quantities:", error);
+    }
+  };
+
+  const initialQuantities = () => {
+    const initialQuantities = {};
+    cart.forEach((item) => {
+      initialQuantities[item.Product.id] = item.quantity;
+    });
+    setQuantities(initialQuantities);
+    console.log("initialQuantities", initialQuantities);
+  };
 
   const increaseQuantity = (productId) => {
-    setQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [productId]: (prevQuantities[productId] || 1) + 1,
-    }));
+    if (quantities[productId] < maxQuantities[productId]) {
+      setQuantities((prevQuantities) => ({
+        ...prevQuantities,
+        [productId]: (Number(prevQuantities[productId]) || 0) + 1,
+      }));
+    }
   };
+  console.log("quantities", quantities);
+  console.log("cart", cart);
 
   const decreaseQuantity = (productId) => {
     setQuantities((prevQuantities) => ({
@@ -27,11 +57,56 @@ const CartPage = () => {
     }));
   };
 
-  useEffect(() => {
-    const authData = JSON.parse(localStorage.getItem("auth"));
-    if (authData && authData.token) {
-      setAuth(authData);
+  const updateCart = async () => {
+    try {
+      let updatedCart = products.map((item) => ({
+        productId: item.id,
+        quantity: quantities[item.id] || 1,
+      }));
+
+      const { data } = await axios.put(
+        `/api/v1/cart/update-cart/${auth.user.id}`,
+        {
+          cart: updatedCart,
+        }
+      );
+      setCart(
+        cart.map((cproduct) => {
+          const updateQuantity = data.updatedCartItems.filter(
+            (ci) => ci.id === cproduct.id
+          );
+          if (updateQuantity.length) {
+            cproduct.quantity = updateQuantity[0].quantity;
+          }
+          return cproduct;
+        })
+      );
+      toast.success("Cart updated successfully");
+    } catch (error) {
+      console.error("Error updating cart:", error);
+      toast.error("Failed to update cart");
     }
+  };
+  const deleteCartItem = async (productId) => {
+    try {
+      await axios.delete(
+        `/api/v1/cart/delete-cart/${productId}/${auth.user.id}`
+      );
+      setCart(cart.filter((item) => item.Product.id !== productId));
+      toast.success("Item removed from cart successfully");
+    } catch (error) {
+      console.error("Error deleting cart item:", error);
+      toast.error("Failed to remove item from cart");
+    }
+  };
+
+  useEffect(() => {
+    // const authData = JSON.parse(localStorage.getItem("auth"));
+    // if (authData && authData.token) {
+    //   setAuth(authData);
+    // }
+    initialQuantities();
+    fetchMaxQuantities();
   }, []);
 
   if (!auth || !auth.token) {
@@ -62,7 +137,7 @@ const CartPage = () => {
                   <th>Action</th>
                 </tr>
               </thead>
-              {cart?.map((p, index) => (
+              {products?.map((p, index) => (
                 <tbody className="align-middle" key={index}>
                   <tr>
                     <td className="align-middle">{p.name}</td>
@@ -101,6 +176,7 @@ const CartPage = () => {
                           <button
                             className="btn btn-sm btn-primary btn-plus"
                             onClick={() => increaseQuantity(p.id)}
+                            disabled={quantities[p.id] === maxQuantities[p.id]}
                           >
                             +
                           </button>
@@ -111,12 +187,22 @@ const CartPage = () => {
                       ${p.price * (quantities[p.id] || 1)}
                     </td>
                     <td className="align-middle">
-                      <button className="btn btn-sm btn-primary">Delete</button>
+                      <button
+                        className="btn btn-sm btn-primary"
+                        onClick={() => deleteCartItem(p.id)}
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 </tbody>
               ))}
             </table>
+            <div>
+              <button className="btn btn-sm btn-primary" onClick={updateCart}>
+                Update Cart
+              </button>
+            </div>
           </div>
           <div className="col-md-3">Payment | Checkout</div>
         </div>
