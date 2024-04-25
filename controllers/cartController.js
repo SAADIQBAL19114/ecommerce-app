@@ -41,7 +41,7 @@ const getCart = async (req, res) => {
       where: {
         userId: uId,
       },
-      include: Product, 
+      include: Product,
     });
 
     res.status(201).json({
@@ -55,7 +55,72 @@ const getCart = async (req, res) => {
   }
 };
 
+const updateCart = async (req, res) => {
+  try {
+    const { uId } = req.params;
+    const cartItems = req.body.cart;
+    const updatedCartItems = await Promise.all(
+      cartItems.map(async (item) => {
+        const cartItem = await Cart.findOne({
+          where: {
+            userId: uId,
+            productId: item.productId,
+          },
+        });
+
+        if (!cartItem) {
+          return res.status(404).json({
+            error: `Cart item with productId ${item.productId} not found for user ${uId}`,
+          });
+        }
+
+        cartItem.quantity = item.quantity;
+        await cartItem.save();
+        return cartItem;
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Cart updated successfully",
+      updatedCartItems,
+    });
+  } catch (error) {
+    console.error("Error updating cart:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const deleteCartItem = async (req, res) => {
+  try {
+    const { uId, pId } = req.params;
+
+    const cartItem = await Cart.findOne({
+      where: {
+        userId: uId,
+        productId: pId,
+      },
+    });
+
+    if (!cartItem) {
+      return res.status(404).json({ error: "Cart item not found" });
+    }
+
+    await cartItem.destroy();
+
+    res.status(200).json({
+      success: true,
+      message: "Cart item deleted successfully",
+      cartItem,
+    });
+  } catch (error) {
+    console.error("Error deleting cart item:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
 module.exports = {
   addToCart,
   getCart,
+  updateCart,
+  deleteCartItem,
 };
