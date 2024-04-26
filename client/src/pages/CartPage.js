@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/Layout/Header";
 import Layout from "../components/Layout/Layout";
 import { useAuth } from "../context/auth";
-import { Navigate } from "react-router-dom";
+import {useNavigate, Navigate, Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useCart } from "../context/cart";
@@ -12,8 +12,15 @@ const CartPage = () => {
   const [cart, setCart] = useCart();
   const [quantities, setQuantities] = useState({});
   const [maxQuantities, setMaxQuantities] = useState({});
+  const [totalAmount, setTotalAmount] = useState(0);
 
+  const navigate = useNavigate()
   const products = cart?.map((item) => item.Product);
+
+  console.log(
+    "cart>>>>>>>>>>",
+    products.map((p) => p.id)
+  );
 
   const fetchMaxQuantities = async () => {
     try {
@@ -82,6 +89,7 @@ const CartPage = () => {
         })
       );
       toast.success("Cart updated successfully");
+      // updateTotalAmount();
     } catch (error) {
       console.error("Error updating cart:", error);
       toast.error("Failed to update cart");
@@ -93,6 +101,7 @@ const CartPage = () => {
         `/api/v1/cart/delete-cart/${productId}/${auth.user.id}`
       );
       setCart(cart.filter((item) => item.Product.id !== productId));
+      // updateTotalAmount();
       toast.success("Item removed from cart successfully");
     } catch (error) {
       console.error("Error deleting cart item:", error);
@@ -100,14 +109,33 @@ const CartPage = () => {
     }
   };
 
+  const handleCheckout = () => {
+    navigate("/checkout", {
+      state: { cart, totalAmount },
+    });
+  };
+
   useEffect(() => {
-    // const authData = JSON.parse(localStorage.getItem("auth"));
-    // if (authData && authData.token) {
-    //   setAuth(authData);
-    // }
     initialQuantities();
     fetchMaxQuantities();
   }, []);
+
+  useEffect(() => {
+    const calculateTotalAmount = () => {
+      let total = 0;
+      cart.map((p) => {
+        if (p.productId === p.Product.id) {
+          total += Number(p.quantity) * Number(p.Product.price);
+        }
+      });
+      return total;
+    };
+    const updateTotalAmount = () => {
+      const total = calculateTotalAmount();
+      setTotalAmount(total);
+    };
+    updateTotalAmount();
+  }, [cart]);
 
   if (!auth || !auth.token) {
     console.log("first");
@@ -116,97 +144,176 @@ const CartPage = () => {
 
   return (
     <Layout>
-      <div className="container">
-        <div className="row">
-          <div className="col-md-12">
+      {cart.length > 0 ? (
+        <div className="container">
+          <div className="row">
+            <div className="col-md-12">
+              <h1 className="text-center bg-light p-2 mb-1">
+                {`Hello ${auth?.token && auth?.user?.name}`}
+              </h1>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-md-9">
+              <table className="text-center table">
+                <thead className="bg-secondary text-dark">
+                  <tr>
+                    <th>Products</th>
+                    <th>Image</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                {products?.map((p, index) => (
+                  <tbody className="align-middle" key={index}>
+                    <tr>
+                      <td className="align-middle">{p.name}</td>
+                      <td className="align-middle">
+                        <img
+                          src={p.image}
+                          className="object-fit-contain"
+                          style={{
+                            width: "80px",
+                            height: "70px",
+                          }}
+                          alt={p.name}
+                        />
+                      </td>
+                      <td className="align-middle">${p.price}</td>
+                      <td className="align-middle">
+                        <div
+                          className="input-group quantity mx-auto"
+                          style={{ width: 100 }}
+                        >
+                          <div className="input-group-btn">
+                            <button
+                              className="btn btn-sm btn-primary btn-minus"
+                              onClick={() => decreaseQuantity(p.id)}
+                            >
+                              -
+                            </button>
+                          </div>
+                          <input
+                            type="text"
+                            className="form-control form-control-sm text-center"
+                            value={quantities[p.id] || 1}
+                            readOnly
+                          />
+                          <div className="input-group-btn">
+                            <button
+                              className="btn btn-sm btn-primary btn-plus"
+                              onClick={() => increaseQuantity(p.id)}
+                              disabled={
+                                quantities[p.id] === maxQuantities[p.id]
+                              }
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="align-middle">
+                        ${p.price * (quantities[p.id] || 1)}
+                      </td>
+                      <td className="align-middle">
+                        <button
+                          className="btn btn-sm btn-primary"
+                          onClick={() => deleteCartItem(p.id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                ))}
+              </table>
+              {cart.length > 0 && (
+                <div className="row justify-content-end">
+                  <div className="col-auto px-4">
+                    <button
+                      className="btn btn-sm btn-primary px-4"
+                      onClick={updateCart}
+                    >
+                      Update Cart
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="col-md-3">
+              <br />
+              <h5>Payment | Checkout</h5>
+              <hr />
+              <div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-evenly",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Payment Method :
+                  </p>
+                  <p
+                    style={{
+                      margin: 0,
+                    }}
+                  >
+                    Cash on Delivery
+                  </p>
+                </div>
+                <hr />
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-evenly",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Total Amount :
+                  </p>
+                  <p
+                    style={{
+                      margin: 0,
+                    }}
+                  >
+                    ${totalAmount}
+                  </p>
+                </div>
+                <br />
+                <div className="row justify-content-center">
+                  <button
+                    className="btn btn-sm btn-primary"
+                    onClick={handleCheckout}
+                  >
+                    Proceed to Checkout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="row" style={{ height: "75vh" }}>
+          <div className="col-md-12 d-flex align-items-center justify-content-center">
             <h1 className="text-center bg-light p-2 mb-1">
-              {`Hello ${auth?.token && auth?.user?.name}`}
+              {`Hello ${auth?.token && auth?.user?.name} Your Cart is Empty `}
             </h1>
           </div>
         </div>
-        <div className="row">
-          <div className="col-md-9">
-            <table className="text-center table">
-              <thead className="bg-secondary text-dark">
-                <tr>
-                  <th>Products</th>
-                  <th>Image</th>
-                  <th>Price</th>
-                  <th>Quantity</th>
-                  <th>Total</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              {products?.map((p, index) => (
-                <tbody className="align-middle" key={index}>
-                  <tr>
-                    <td className="align-middle">{p.name}</td>
-                    <td className="align-middle">
-                      <img
-                        src={p.image}
-                        className="object-fit-contain"
-                        style={{
-                          width: "80px",
-                          height: "70px",
-                        }}
-                        alt={p.name}
-                      />
-                    </td>
-                    <td className="align-middle">${p.price}</td>
-                    <td className="align-middle">
-                      <div
-                        className="input-group quantity mx-auto"
-                        style={{ width: 100 }}
-                      >
-                        <div className="input-group-btn">
-                          <button
-                            className="btn btn-sm btn-primary btn-minus"
-                            onClick={() => decreaseQuantity(p.id)}
-                          >
-                            -
-                          </button>
-                        </div>
-                        <input
-                          type="text"
-                          className="form-control form-control-sm text-center"
-                          value={quantities[p.id] || 1}
-                          readOnly
-                        />
-                        <div className="input-group-btn">
-                          <button
-                            className="btn btn-sm btn-primary btn-plus"
-                            onClick={() => increaseQuantity(p.id)}
-                            disabled={quantities[p.id] === maxQuantities[p.id]}
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="align-middle">
-                      ${p.price * (quantities[p.id] || 1)}
-                    </td>
-                    <td className="align-middle">
-                      <button
-                        className="btn btn-sm btn-primary"
-                        onClick={() => deleteCartItem(p.id)}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              ))}
-            </table>
-            <div>
-              <button className="btn btn-sm btn-primary" onClick={updateCart}>
-                Update Cart
-              </button>
-            </div>
-          </div>
-          <div className="col-md-3">Payment | Checkout</div>
-        </div>
-      </div>
+      )}
     </Layout>
   );
 };
