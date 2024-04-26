@@ -3,28 +3,62 @@ const { Product, User, Cart } = require("../sequelize/models");
 const addToCart = async (req, res) => {
   try {
     const { pId, uId } = req.params;
-
-    const product = await Product.findOne({ where: { id: pId } });
-    console.log("product", product);
-    const user = await User.findOne({ where: { id: uId } });
-    console.log("user", user);
-
-    if (!user || !product) {
-      return res.status(404).json({ error: "User or category not found." });
+    const product = await Product.findByPk(pId);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
     }
-
-    // Add item to cart
-    const cartItem = await Cart.create({
-      userId: user.id,
-      productId: product.id,
-      quantity: product.quantity,
-      Total: 100,
+    const user = await User.findByPk(uId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const existingCartItem = await Cart.findOne({
+      where: {
+        userId: uId,
+        productId: pId,
+      },
     });
 
-    res.status(201).json(cartItem);
+    if (existingCartItem) {
+      return res
+        .status(400)
+        .json({ error: "Product already exists in the cart" });
+    }
+
+    await Cart.create({
+      userId: uId,
+      productId: pId,
+      quantity: 1,
+    });
+
+    const resp = await getCartItems(uId);
+    console.log("resp", resp);
+    res.status(201).json({
+      success: true,
+      message: "Cart Created",
+      cartItem: resp,
+    });
   } catch (error) {
     console.error("Error adding item to cart:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const getCartItems = async (uId) => {
+  try {
+    const user = await User.findByPk(uId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const cartItems = await Cart.findAll({
+      where: {
+        userId: uId,
+      },
+      include: Product,
+    });
+    return cartItems;
+  } catch (error) {
+    console.error("Error fetching cart items:", error);
   }
 };
 
@@ -49,6 +83,8 @@ const getCart = async (req, res) => {
       message: "Cart Items",
       cartItems,
     });
+    console.log("res Get: ", res);
+    return res;
   } catch (error) {
     console.error("Error fetching cart items:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -59,6 +95,8 @@ const updateCart = async (req, res) => {
   try {
     const { uId } = req.params;
     const cartItems = req.body.cart;
+    console.log("cartItems", cartItems);
+    console.log("Id", uId);
     const updatedCartItems = await Promise.all(
       cartItems.map(async (item) => {
         const cartItem = await Cart.findOne({
@@ -68,14 +106,16 @@ const updateCart = async (req, res) => {
           },
         });
 
+        console.log("cartItem", cartItem);
+
         if (!cartItem) {
-          return res.status(404).json({
+          return res.status(401).json({
             error: `Cart item with productId ${item.productId} not found for user ${uId}`,
           });
         }
-
         cartItem.quantity = item.quantity;
         await cartItem.save();
+
         return cartItem;
       })
     );
@@ -118,6 +158,7 @@ const deleteCartItem = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 module.exports = {
   addToCart,
   getCart,
