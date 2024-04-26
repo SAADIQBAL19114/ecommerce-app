@@ -74,6 +74,7 @@ const HomePage = () => {
       const {data} = await axios.post(`/api/v1/cart/add-to-cart/${pId}/${auth.user.id}`);
       if (data?.success) {
         toast.success("Item Added to cart");
+        setCart(data.cartItem);
       }
     } catch (error) {
       console.log(error);

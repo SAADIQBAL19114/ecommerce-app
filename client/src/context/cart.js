@@ -8,25 +8,25 @@ const CartProvider = ({ children }) => {
   const [auth, setAuth] = useAuth();
   const [cart, setCart] = useState([]);
 
-  useEffect(() => {
-    const addToCart = async () => {
-      if (auth.user) {
-        try {
-          console.log(auth.user.id);
-          const { data } = await axios.get(`/api/v1/cart/get/${auth.user.id}`);
-          if (data?.success) {
-            const newV = data.cartItems;
-            setCart(newV);
-          }
-        } catch (error) {
-          console.error(error);
+  const getCartData = async () => {
+    if (auth.user) {
+      try {
+        console.log(auth.user?.id);
+        const { data } = await axios.get(`/api/v1/cart/get/${auth.user.id}`);
+        if (data?.success) {
+          const newV = data.cartItems;
+          setCart(newV);
         }
+      } catch (error) {
+        console.error(error);
       }
-    };
-    addToCart();
+    }
+  };
+  useEffect(() => {
+    getCartData();
   }, [auth]);
   return (
-    <CartContext.Provider value={[cart, setCart]}>
+    <CartContext.Provider value={[cart,setCart]}>
       {children}
     </CartContext.Provider>
   );
