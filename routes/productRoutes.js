@@ -7,6 +7,7 @@ const {
   editProductController,
   productFilerController,
   relatedProductController,
+  deleteCartQuantity,
 } = require("../controllers/productController.js");
 const { upload } = require("../middlewares/multer.middleware.js");
 
@@ -16,6 +17,7 @@ router.post("/create-product", upload.single("image"), createProductController);
 router.get("/all-product", getAllProductController);
 router.get("/get-product/:productId", getSingleProductController);
 router.delete("/delete-product/:productId", deleteProductController);
+router.delete("/delete-quantity-of-cart/", deleteCartQuantity);
 router.put(
   "/edit-product/:productId",
   upload.single("image"),

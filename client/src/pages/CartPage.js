@@ -13,7 +13,7 @@ const CartPage = () => {
   const [quantities, setQuantities] = useState({});
   const [maxQuantities, setMaxQuantities] = useState({});
   const [totalAmount, setTotalAmount] = useState(0);
-
+console.log(">>><<<<<<<<>>>>>>>>>><<<<<<?????", auth);
   const navigate = useNavigate()
   const products = cart?.map((item) => item.Product);
 
@@ -137,7 +137,9 @@ const CartPage = () => {
     updateTotalAmount();
   }, [cart]);
 
-  if (!auth || !auth.token) {
+  const authLocalstorage = localStorage.getItem("auth")
+
+  if (!authLocalstorage) {
     console.log("first");
     return <Navigate to="/login" />;
   }
