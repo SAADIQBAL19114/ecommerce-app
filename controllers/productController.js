@@ -176,10 +176,99 @@ const editProductController = async (req, res) => {
   }
 };
 
+const deleteCartQuantity = async (req, res) => {
+  try {
+    const cartItems = req.body;
+    console.log(">>>>>>>>>>>>>>", cartItems)
+    for (const item of cartItems) {
+      const product = await Product.findByPk(item.productId);
+      if (product) { 
+        product.quantity -= item.quantity;
+        await product.save();
+      }
+    }
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Product quantities updated successfully",
+      });
+  } catch (error) {
+    console.error("Error updating product quantities:", error);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to update product quantities" });
+  }
+}
+
+// filter controller
+
+const productFilerController = async (req, res) => {
+  try {
+    const { checked, radio } = req.body;
+    let where = {};
+    if (checked.length > 0) {
+      where.categoryId = checked;
+    }
+    if (radio.length) {
+      where.price = {
+        [Op.gte]: radio[0],
+        [Op.lte]: radio[1],
+      };
+    }
+    const products = await Product.findAll({
+      where,
+    });
+
+    res.status(200).send({
+      success: true,
+      products,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Error while filtering product",
+      error: error.message,
+    });
+  }
+};
+
+// related Product
+
+const relatedProductController = async (req, res) => {
+  console.log("in related product controller???????????");
+  try {
+    const { pid, cid } = req.params;
+    console.log("first", pid, cid);
+    const products = await Product.findAll({
+      where: {
+        categoryId: cid,
+        id: { [Op.ne]: pid },
+      },
+      limit: 3,
+    });
+    res.status(200).send({
+      success: true,
+      products,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Error while getting related product",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createProductController,
   getAllProductController,
   getSingleProductController,
   deleteProductController,
   editProductController,
+  productFilerController,
+  relatedProductController,
+  deleteCartQuantity,
 };

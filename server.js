@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const authRoutes = require("./routes/authRoute.js");
 const productRoutes = require("./routes/productRoutes.js");
 const categoryRoutes = require("./routes/categoryRoute.js");
+const orderRoutes = require("./routes/orderRoute.js");
 const cartRoutes = require("./routes/cartRoute.js")
 const { sequelize } = require("./sequelize/models");
 
@@ -23,6 +24,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/cart", cartRoutes);
+app.use("/api/v1/order", orderRoutes);
 
 // rest api
 app.get("/", (req, res) => {
@@ -40,7 +42,7 @@ app.listen(PORT, async () => {
     `server is running on ${process.env.DEV_MODE} mode on port ${PORT}`.bgCyan
       .black
   );
-  await sequelize.sync({alter:true});
+  await sequelize.sync();
   console.log("All models were synchronized successfully.");
   // await sequelize.authenticate()
   // console.log("Data base connected".bgRed .brightWhite);
