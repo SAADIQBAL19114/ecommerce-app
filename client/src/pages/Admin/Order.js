@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/auth";
 import Layout from "../../components/Layout/Layout";
-import UserMenu from "../../components/Layout/UserMenu";
+import AdminMenu from "../../components/Layout/AdminMenu";
 
 const Order = () => {
   const [auth, setAuth] = useAuth();
@@ -30,7 +30,7 @@ const Order = () => {
       <div className="container-fluid m-3 p-3">
         <div className="row">
           <div className="col-md-3">
-            <UserMenu />
+            <AdminMenu />
           </div>
           <div className="col-md-9">
             <h1>Your Orders</h1>

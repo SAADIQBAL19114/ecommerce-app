@@ -22,7 +22,6 @@ const HomePage = () => {
   const [search, setSearch] = useState("");
   const [disabledButtons, setDisabledButtons] = useState({});
 
-
   const getAllProducts = async () => {
     try {
       const { data } = await axios.get("/api/v1/product/all-product");
@@ -69,18 +68,27 @@ const HomePage = () => {
     // getAllProducts();
   };
 
-  const addToCart =async(pId) => {
+  const addToCart = async (pId) => {
     try {
-      const {data} = await axios.post(`/api/v1/cart/add-to-cart/${pId}/${auth.user.id}`);
+      const { data } = await axios.post(
+        `/api/v1/cart/add-to-cart/${pId}/${auth.user.id}`
+      );
       if (data?.success) {
         toast.success("Item Added to cart");
         setCart(data.cartItem);
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong in getting Products");
+      if (
+        error.response &&
+        error.response.status === 400 &&
+        error.response.data.error === "Product out of stock"
+      ) {
+        toast.error("Product is out of stock");
+      } else {
+        toast.error("Something went wrong in getting Products");
+      }
     }
-    
   };
 
   useEffect(() => {
@@ -155,9 +163,6 @@ const HomePage = () => {
             <div className="col-md-4">
               <form className="searchForm" onSubmit={(e) => e.preventDefault()}>
                 <div className="input-group">
-                  <label htmlFor="search" className="visually-hidden">
-                    Search
-                  </label>
                   <input
                     id="search"
                     type="text"
@@ -167,9 +172,6 @@ const HomePage = () => {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
-                  <button className="btn btn-outline-secondary" type="submit">
-                    Search
-                  </button>
                 </div>
               </form>
             </div>
