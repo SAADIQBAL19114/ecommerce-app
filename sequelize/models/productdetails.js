@@ -1,34 +1,21 @@
-
 "use strict";
 const { Model } = require("sequelize");
-
 module.exports = (sequelize, DataTypes) => {
-  class Order extends Model {
+  class ProductDetails extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-
-    static associate({ User, Product }) {
+    static associate({ Order, Product }) {
       // define association here
-      this.belongsTo(User, { foreignKey: "userId" });
-      // this.hasMany(Product, { foreignKey: "ProductId" });
-
+      // this.belongsTo(Order, { foreignKey: "OrderId" });
+      // this.belongsTo(Product, { foreignKey: "ProductId" });
     }
   }
-  Order.init(
+  ProductDetails.init(
     {
-
-      productName: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notNull: { msg: "Product name is required" },
-        },
-        trim: true,
-      },
-      quantity: {
+      stock: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -36,27 +23,27 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      shippingAddress: {
+      color: {
         type: DataTypes.STRING,
         allowNull: false,
-        trim: true,
       },
-      userId: {
+      size: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      productId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "Users",
-
+          model: "Products",
           id: "id",
         },
       },
     },
     {
       sequelize,
-      modelName: "Order",
+      modelName: "ProductDetails",
     }
   );
-  return Order;
-
+  return ProductDetails;
 };
-

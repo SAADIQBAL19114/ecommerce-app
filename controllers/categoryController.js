@@ -73,6 +73,7 @@ const updateCategroyController = async (req, res) => {
         category,
       });
     }
+
   } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -133,10 +134,13 @@ const deleteCategoryController = async (req, res) => {
   }
 };
 
+
 module.exports = {
   createCategroyController,
   getAllCategories,
+
   updateCategroyController,
   singleCategory,
   deleteCategoryController,
 };
+

@@ -1,3 +1,4 @@
+
 const { Product, User, Cart } = require("../sequelize/models");
 
 const addToCart = async (req, res) => {
@@ -184,3 +185,4 @@ module.exports = {
   deleteCartItem,
   deleteAllCartItems,
 };
+

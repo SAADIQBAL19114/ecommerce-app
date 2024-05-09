@@ -1,7 +1,6 @@
 const { hashPassword, comparePassword } = require("../helpers/authHelper");
 const { User } = require("../sequelize/models");
-const JWT = require("jsonwebtoken")
-
+const JWT = require("jsonwebtoken");
 
 // regsiter USER
 const registerController = async (req, res) => {
@@ -31,7 +30,13 @@ const registerController = async (req, res) => {
       });
     }
     const hashedPassword = await hashPassword(password);
-    const user = await User.create({name, email, password:hashedPassword, phone, address});
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+      address,
+    });
     res.status(201).json({
       success: true,
       message: "User Registered",
@@ -51,6 +56,7 @@ const registerController = async (req, res) => {
 const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log("email >>>>>" ,email);
     //validation
     if (!email || !password) {
       return res.status(404).send({
@@ -59,9 +65,10 @@ const loginController = async (req, res) => {
       });
     }
     //check user
-    const user = await User.findOne({ email });
+    const user = await User.findOne({where:{ email }});
+    console.log("user >>>>>>", user);
     if (!user) {
-      return res.status(404).send({
+      return res.status(404).json({
         success: false,
         message: "Email is not registerd",
       });
@@ -107,9 +114,11 @@ const getALlUsersController = async (req, res) => {
     const user = await User.findAll();
     if (user != "") {
       return res.status(200).json({
+
         success:true,
         message: "Data Retrieved",
         user,
+
       });
     } else {
       return res.status(400).json({
@@ -124,6 +133,7 @@ const getALlUsersController = async (req, res) => {
     });
   }
 };
+
 
 // edit USER
 
@@ -205,6 +215,8 @@ module.exports = {
   registerController,
   loginController,
   getALlUsersController,
+
   editUserController,
   deleteUserController,
+
 };

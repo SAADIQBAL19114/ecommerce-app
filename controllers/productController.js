@@ -1,4 +1,5 @@
 const { Product } = require("../sequelize/models");
+
 const {
   uploadOnCloudinary,
   deleteFromCloudinary,
@@ -7,12 +8,14 @@ const {
 const createProductController = async (req, res) => {
   try {
     const { name, description, categoryId, price, quantity } = req.body;
+
     if (!name) {
       return res.send({ error: "Name is Required" });
     }
     if (!description) {
       return res.send({ error: "description is Required" });
     }
+
     if (!categoryId) {
       return res.send({ error: "categoryId is Required" });
     }
@@ -43,6 +46,7 @@ const createProductController = async (req, res) => {
       data: {
         product,
       },
+
     });
   } catch (error) {
     console.log(error);
@@ -56,6 +60,7 @@ const createProductController = async (req, res) => {
 
 const getAllProductController = async (req, res) => {
   try {
+
     const product = await Product.findAll({ order: [["id", "ASC"]] });
     if (product != "") {
       return res.status(200).send({
@@ -81,6 +86,7 @@ const getSingleProductController = async (req, res) => {
   try {
     const { productId } = req.params;
     const product = await Product.findOne({ where: { id: productId } });
+
     if (product != "") {
       return res.status(200).json({
         message: "Data Retrieved",
@@ -88,7 +94,9 @@ const getSingleProductController = async (req, res) => {
       });
     } else {
       return res.status(400).json({
+
         message: "no Product with this id in the database",
+
       });
     }
   } catch (error) {
@@ -99,6 +107,7 @@ const getSingleProductController = async (req, res) => {
     });
   }
 };
+
 
 const deleteProductController = async (req, res) => {
   try {
@@ -271,4 +280,5 @@ module.exports = {
   productFilerController,
   relatedProductController,
   deleteCartQuantity,
+
 };
