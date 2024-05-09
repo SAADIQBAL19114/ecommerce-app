@@ -7,6 +7,9 @@ const addToCart = async (req, res) => {
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
+    if (product.quantity === 0) {
+      return res.status(400).json({ error: "Product out of stock" });
+    }
     const user = await User.findByPk(uId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -159,9 +162,24 @@ const deleteCartItem = async (req, res) => {
   }
 };
 
+const deleteAllCartItems = async (req, res) => {
+  try {
+    const {uId} = req.params;
+
+    await Cart.destroy({ where: { userId: uId } });
+
+    res
+      .status(200)
+      .json({ success: true, message: "All cart items deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 module.exports = {
   addToCart,
   getCart,
   updateCart,
   deleteCartItem,
+  deleteAllCartItems,
 };

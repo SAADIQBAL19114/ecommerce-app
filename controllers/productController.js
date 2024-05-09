@@ -181,6 +181,31 @@ const editProductController = async (req, res) => {
   }
 };
 
+const deleteCartQuantity = async (req, res) => {
+  try {
+    const cartItems = req.body;
+    console.log(">>>>>>>>>>>>>>", cartItems)
+    for (const item of cartItems) {
+      const product = await Product.findByPk(item.productId);
+      if (product) { 
+        product.quantity -= item.quantity;
+        await product.save();
+      }
+    }
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Product quantities updated successfully",
+      });
+  } catch (error) {
+    console.error("Error updating product quantities:", error);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to update product quantities" });
+  }
+}
+
 // filter controller
 
 const productFilerController = async (req, res) => {
@@ -250,4 +275,5 @@ module.exports = {
   editProductController,
   productFilerController,
   relatedProductController,
+  deleteCartQuantity,
 };
