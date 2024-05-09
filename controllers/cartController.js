@@ -1,6 +1,7 @@
 
 const { Product, User, Cart } = require("../sequelize/models");
 
+
 const addToCart = async (req, res) => {
   try {
     const { pId, uId } = req.params;
@@ -46,7 +47,6 @@ const addToCart = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 const getCartItems = async (uId) => {
   try {
@@ -150,6 +150,7 @@ const deleteCartItem = async (req, res) => {
     if (!cartItem) {
       return res.status(404).json({ error: "Cart item not found" });
     }
+
 
     await cartItem.destroy();
 

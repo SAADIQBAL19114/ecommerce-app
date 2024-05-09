@@ -1,4 +1,9 @@
-const { Product } = require("../sequelize/models");
+const { Product, Category } = require("../sequelize/models");
+const { Op } = require("sequelize");
+const {
+  uploadOnCloudinary,
+  deleteFromCloudinary,
+} = require("../utils/cloudinary.js");
 
 const {
   uploadOnCloudinary,
@@ -8,29 +13,23 @@ const {
 const createProductController = async (req, res) => {
   try {
     const { name, description, categoryId, price, quantity } = req.body;
-
     if (!name) {
       return res.send({ error: "Name is Required" });
     }
     if (!description) {
       return res.send({ error: "description is Required" });
     }
-
     if (!categoryId) {
       return res.send({ error: "categoryId is Required" });
     }
-
     const imageLocalPath = req.file?.path;
-    console.log("Helleo", req.file);
-    console.log("CategoryId", categoryId);
 
     if (!imageLocalPath) {
-      return res.status(400).json({ message: "Image file is required" });
+      res.status(400).json({ message: "Image file is required" });
     }
     const productImage = await uploadOnCloudinary(imageLocalPath);
-    console.log("Product Image", productImage);
     if (!productImage) {
-      return res.status(400).json({ message: "Image file is required ...." });
+      res.status(400).json({ message: "Image file is required" });
     }
     const product = await Product.create({
       name,
@@ -43,10 +42,7 @@ const createProductController = async (req, res) => {
     res.status(201).send({
       success: true,
       message: "Product created",
-      data: {
-        product,
-      },
-
+      product,
     });
   } catch (error) {
     console.log(error);
@@ -60,12 +56,11 @@ const createProductController = async (req, res) => {
 
 const getAllProductController = async (req, res) => {
   try {
-
     const product = await Product.findAll({ order: [["id", "ASC"]] });
     if (product != "") {
       return res.status(200).send({
         success: true,
-        message: "All Products Recieved",
+        message: "Data Retrieved",
         product,
       });
     } else {
@@ -85,16 +80,21 @@ const getAllProductController = async (req, res) => {
 const getSingleProductController = async (req, res) => {
   try {
     const { productId } = req.params;
-    const product = await Product.findOne({ where: { id: productId } });
+
+    let product = await Product.findOne({ where: { id: productId } });
+    let category = await Category.findOne({
+      where: { id: product.categoryId },
+    });
+    product.dataValues.category = category.name;
 
     if (product != "") {
       return res.status(200).json({
+        success: true,
         message: "Data Retrieved",
-        data: product,
+        product,
       });
     } else {
       return res.status(400).json({
-
         message: "no Product with this id in the database",
 
       });
@@ -121,12 +121,15 @@ const deleteProductController = async (req, res) => {
 
     if (product.image) {
       await deleteFromCloudinary(product.image);
-      await product.destroy();
-      res.status(200).send({
-        success: true,
-        message: "Product Deleted Successfully",
-      });
     }
+
+    await product.destroy();
+
+    res.status(200).json({
+      success: true,
+      message: "Product deleted successfully",
+      product,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -140,37 +143,39 @@ const deleteProductController = async (req, res) => {
 const editProductController = async (req, res) => {
   try {
     const { productId } = req.params;
-    const { name, description, price, quantity } = req.body;
+    const { name, description, price, quantity, categoryId } = req.body;
 
     const product = await Product.findOne({ where: { id: productId } });
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-    if (req.file) {
-      await deleteFromCloudinary(product.image);
-    }
     const imageLocalPath = req.file?.path;
+    if (imageLocalPath) {
+      if (req.file) {
+        await deleteFromCloudinary(product.image);
+      }
 
-    if (!imageLocalPath) {
-      res.status(400).json({ message: "Image file is required" });
+      if (!imageLocalPath) {
+        res.status(400).json({ message: "Image file is required" });
+      }
+      const productImage = await uploadOnCloudinary(imageLocalPath);
+      if (!productImage) {
+        res.status(400).json({ message: "Image file is required" });
+      }
+      product.image = productImage.url;
     }
-    const productImage = await uploadOnCloudinary(imageLocalPath);
-    if (!productImage) {
-      res.status(400).json({ message: "Image file is required" });
-    }
+    if (name) product.name = name;
+    if (description) product.description = description;
+    if (price) product.price = price;
+    if (quantity) product.quantity = quantity;
+    if (categoryId) product.categoryId = categoryId;
 
-    // product.categoryId= categoryId
-    product.name = name;
-    product.description = description;
-    product.price = price;
-    product.quantity = quantity;
-    product.image = productImage.url;
+    const resp = await product.save();
+    console.log("Resp", resp);
+    console.log("Product", product);
 
-    console.log("product??>>>>>>", product);
-    await product.save();
-
-    res.status(201).send({
+    res.status(200).json({
       success: true,
       message: "Product updated",
       product,

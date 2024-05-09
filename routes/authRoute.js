@@ -24,33 +24,6 @@ router.post("/login", loginController );
 // GET ALL USERS || GET
 router.get("/user", getALlUsersController);
 
-// EDIT USER || PUT
-router.put("/edit-user/:userId", editUserController);
-
-// DELETE USER || DELETE
-router.delete("/delete-user/:userId", deleteUserController);
-
-// test route
-router.get("/test", requireSignIn, isAdmin, (req, res) => {
-  console.log("protected route");
-  res.send({
-    message: "protected routes",
-  });
-});
-
-//protected route auth (USER)
-router.get("/user-auth", requireSignIn, (req, res) => {
-  res.status(200).send({ ok: true });
-});
-
-//protected route auth (ADMIN)
-router.get("/admin-auth", requireSignIn,isAdmin, (req, res) => {
-  res.status(200).send({ ok: true });
-});
-
-// GET ALL USERS || GET
-router.get("/user", getALlUsersController);
-
 // test route
 router.get("/test", requireSignIn, isAdmin, (req, res) => {
   console.log("protected route");

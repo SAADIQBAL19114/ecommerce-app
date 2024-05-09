@@ -33,7 +33,7 @@ const createCategroyController = async (req, res) => {
 const getAllCategories = async (req, res) => {
   try {
     const category = await Category.findAll();
-    console.log('Categories',category);
+
     if (category != "") {
       return res.status(200).send({
         success: true,
@@ -66,7 +66,9 @@ const updateCategroyController = async (req, res) => {
       });
     } else {
       category.name = name;
+
      await category.save();
+
       res.status(201).send({
         success: true,
         messsage: "Category Updated Successfully",
@@ -118,6 +120,33 @@ const deleteCategoryController = async (req, res) => {
         message: "please provide a valid id",
       });
     } else {
+      category.destroy();
+      res.status(200).send({
+        success: true,
+        message: "Categry Deleted Successfully",
+      });
+
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+
+      error,
+      message: "Error While getting Single Category",
+    });
+  }
+};
+
+const deleteCategoryController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const category = await Category.findOne({ where: { id } });
+    if (category == null) {
+      return res.status(400).json({
+        message: "please provide a valid id",
+      });
+    } else {
       await category.destroy();
       res.status(200).send({
         success: true,
@@ -138,9 +167,7 @@ const deleteCategoryController = async (req, res) => {
 module.exports = {
   createCategroyController,
   getAllCategories,
-
   updateCategroyController,
   singleCategory,
   deleteCategoryController,
 };
-
