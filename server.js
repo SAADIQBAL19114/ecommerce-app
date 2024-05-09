@@ -46,7 +46,7 @@ app.listen(PORT, async () => {
     `server is running on ${process.env.DEV_MODE} mode on port ${PORT}`.bgCyan
       .black
   );
-  await sequelize.sync();
+  await sequelize.sync({alter: true});
   console.log("All models were synchronized successfully.");
   // await sequelize.authenticate()
   // console.log("Data base connected".bgRed .brightWhite);

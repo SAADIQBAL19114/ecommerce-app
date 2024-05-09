@@ -1,11 +1,10 @@
-
 const { Product, User, Cart } = require("../sequelize/models");
-
 
 const addToCart = async (req, res) => {
   try {
     const { pId, uId } = req.params;
     const product = await Product.findByPk(pId);
+    console.log("first call==========>>>>>>>>");
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
@@ -13,15 +12,19 @@ const addToCart = async (req, res) => {
       return res.status(400).json({ error: "Product out of stock" });
     }
     const user = await User.findByPk(uId);
+    console.log("second call==========>>>>>>>>");
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+    console.log("thirds call==========>>>>>>>>");
     const existingCartItem = await Cart.findOne({
       where: {
         userId: uId,
         productId: pId,
       },
     });
+    console.log("thirds call==========>>>>>>>>");
 
     if (existingCartItem) {
       return res
@@ -151,7 +154,6 @@ const deleteCartItem = async (req, res) => {
       return res.status(404).json({ error: "Cart item not found" });
     }
 
-
     await cartItem.destroy();
 
     res.status(200).json({
@@ -167,7 +169,7 @@ const deleteCartItem = async (req, res) => {
 
 const deleteAllCartItems = async (req, res) => {
   try {
-    const {uId} = req.params;
+    const { uId } = req.params;
 
     await Cart.destroy({ where: { userId: uId } });
 
@@ -186,4 +188,3 @@ module.exports = {
   deleteCartItem,
   deleteAllCartItems,
 };
-

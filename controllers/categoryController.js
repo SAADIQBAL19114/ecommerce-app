@@ -111,32 +111,6 @@ const singleCategory = async (req, res) => {
   }
 };
 
-const deleteCategoryController = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const category = await Category.findOne({ where: { id } });
-    if (category == null) {
-      return res.status(400).json({
-        message: "please provide a valid id",
-      });
-    } else {
-      category.destroy();
-      res.status(200).send({
-        success: true,
-        message: "Categry Deleted Successfully",
-      });
-
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).send({
-      success: false,
-
-      error,
-      message: "Error While getting Single Category",
-    });
-  }
-};
 
 const deleteCategoryController = async (req, res) => {
   try {

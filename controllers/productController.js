@@ -5,11 +5,6 @@ const {
   deleteFromCloudinary,
 } = require("../utils/cloudinary.js");
 
-const {
-  uploadOnCloudinary,
-  deleteFromCloudinary,
-} = require("../utils/cloudinary.js");
-
 const createProductController = async (req, res) => {
   try {
     const { name, description, categoryId, price, quantity } = req.body;
