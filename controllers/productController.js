@@ -5,6 +5,11 @@ const {
   deleteFromCloudinary,
 } = require("../utils/cloudinary.js");
 
+const {
+  uploadOnCloudinary,
+  deleteFromCloudinary,
+} = require("../utils/cloudinary.js");
+
 const createProductController = async (req, res) => {
   try {
     const { name, description, categoryId, price, quantity } = req.body;
@@ -75,11 +80,13 @@ const getAllProductController = async (req, res) => {
 const getSingleProductController = async (req, res) => {
   try {
     const { productId } = req.params;
+
     let product = await Product.findOne({ where: { id: productId } });
     let category = await Category.findOne({
       where: { id: product.categoryId },
     });
     product.dataValues.category = category.name;
+
     if (product != "") {
       return res.status(200).json({
         success: true,
@@ -89,6 +96,7 @@ const getSingleProductController = async (req, res) => {
     } else {
       return res.status(400).json({
         message: "no Product with this id in the database",
+
       });
     }
   } catch (error) {
@@ -99,6 +107,7 @@ const getSingleProductController = async (req, res) => {
     });
   }
 };
+
 
 const deleteProductController = async (req, res) => {
   try {
@@ -276,4 +285,5 @@ module.exports = {
   productFilerController,
   relatedProductController,
   deleteCartQuantity,
+
 };

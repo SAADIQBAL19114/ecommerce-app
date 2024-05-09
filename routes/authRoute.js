@@ -3,6 +3,10 @@ const {
   registerController,
   loginController,
   getALlUsersController,
+
+  editUserController,
+  deleteUserController,
+
 } = require("../controllers/authController.js");
 const { requireSignIn, isAdmin } = require("../middlewares/authMiddleware.js");
 

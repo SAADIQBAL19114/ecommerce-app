@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.belongsTo(Category, { foreignKey: "categoryId" });
       this.hasMany(Cart)
+
       // this.hasMany(ProductDetails, { foreignKey: "ProductDetailsId" });
     }
   }
@@ -36,6 +37,7 @@ module.exports = (sequelize, DataTypes) => {
       image: {
         type: DataTypes.STRING,
       },
+
       price: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -44,6 +46,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+
       categoryId: {
         type: DataTypes.INTEGER,
         allowNull: false,

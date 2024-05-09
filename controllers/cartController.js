@@ -1,4 +1,6 @@
+
 const { Product, User, Cart } = require("../sequelize/models");
+
 
 const addToCart = async (req, res) => {
   try {
@@ -149,6 +151,7 @@ const deleteCartItem = async (req, res) => {
       return res.status(404).json({ error: "Cart item not found" });
     }
 
+
     await cartItem.destroy();
 
     res.status(200).json({
@@ -183,3 +186,4 @@ module.exports = {
   deleteCartItem,
   deleteAllCartItems,
 };
+

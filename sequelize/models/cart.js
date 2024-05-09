@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(User, { foreignKey: "userId" });
       this.belongsTo(Product, { foreignKey: "productId" });
       
+
     }
   }
   Cart.init(
@@ -19,6 +20,11 @@ module.exports = (sequelize, DataTypes) => {
       quantity: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+
+      Total:{
+        type:DataTypes.INTEGER,
+        allowNull:false
       },
       userId: {
         type: DataTypes.INTEGER,
