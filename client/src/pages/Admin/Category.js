@@ -6,15 +6,20 @@ import axios from "axios";
 import CategoryForm from "../../components/Form/CategoryForm";
 import { Modal } from "antd";
 import Table from "../../components/Table";
-
+import DeleteModal from "../../components/DeleteModal";
 
 const CreateCategory = () => {
   const [categories, setCategories] = useState([]);
   const [name, setName] = useState("");
   const [visible, setVisible] = useState(false);
+  const [editVisible, setEditVisible] = useState(false);
   const [selected, setSelected] = useState(null);
   const [updatedName, setUpdatedName] = useState("");
   const [fields, setFields] = useState([]);
+  const [reload, setReload] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deleteId, setDeleteId] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Create Category
   const handleSubmit = async (e) => {
@@ -27,6 +32,8 @@ const CreateCategory = () => {
         toast.success(`${name} is created`);
         getAllCategories();
         setName("");
+        
+        setVisible(false)
       } else {
         toast.error(data?.message);
       }
@@ -50,6 +57,7 @@ const CreateCategory = () => {
         setUpdatedName("");
         setVisible(false);
         getAllCategories();
+        setEditVisible(false);
       } else {
         toast.error(data.message);
       }
@@ -59,26 +67,31 @@ const CreateCategory = () => {
   };
   // Delete Category
   const handleDelete = async (id) => {
+    setDeleteLoading(true);
     try {
       const { data } = await axios.delete(
         `/api/v1/category/delete-category/${id}`
       );
       if (data.success) {
-        console.log("first");
+        toast.success(`Category is Deleted`);
+        setDeleteLoading(false);
+        setOpenDeleteModal(false);
         getAllCategories();
-        toast.success(`category is Deleted`);
       } else {
         toast.error(data.message);
+        setDeleteLoading(false);
       }
     } catch (error) {
       toast.error("something went wrong");
+      setDeleteLoading(false);
+      setOpenDeleteModal(false);
     }
   };
-
   // get all categories
   const getAllCategories = async () => {
     try {
-      const { data } = await axios.get("/api/v1/category/all-category");
+      const { status, data } = await axios.get("/api/v1/category/all-category");
+      console.log(data, status);
       if (data.success) {
         setCategories(data.category);
       }
@@ -90,15 +103,13 @@ const CreateCategory = () => {
 
   useEffect(() => {
     getAllCategories();
-  }, []);
+  }, [reload]);
   useEffect(() => {
     setFields([
       {
         title: "Name",
         dataIndex: "name",
         type: "text",
-        require: true,
-        message: "Please Enter the Name",
         onTable: true,
       },
       {
@@ -118,69 +129,48 @@ const CreateCategory = () => {
           </div>
           <div className="col-md-9">
             <h1>Manage Category</h1>
-            <div className="p-3 w-50">
-              <CategoryForm
-                handleSubmit={handleSubmit}
-                value={name}
-                setValue={setName}
-              />
-            </div>
+            <button
+              type="submit"
+              className="btn btn-primary mb-4"
+              onClick={() => {
+                setVisible(true);
+              }}
+            >
+              Add Category
+            </button>
             <div className="w-75">
               <Table
                 data={categories}
-                setEditProductVisible={setVisible}
+                setEditProductVisible={setEditVisible}
                 setUpdatedName={setUpdatedName}
                 setSelected={setSelected}
-                handleDelete={handleDelete}
                 formfields={fields}
+                setOpenDeleteModal={setOpenDeleteModal}
+                setDeleteId={setDeleteId}
               />
-              {/* <table className="table">
-                <thead>
-                  <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {categories?.map((c, index) => (
-                      <tr key={index+1}>
-                        <td>{c.name}</td>
-                        <td>
-                          <button
-                            className="btn btn-primary ms-2"
-                            onClick={() => {
-                              setVisible(true);
-                              setUpdatedName(c.name);
-                              setSelected(c);
-                              console.log("c>>>>>>>>", c);
-                            }}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            className="btn btn-danger ms-2"
-                            onClick={() => handleDelete(c.id)}
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                  ))}
-                </tbody>
-              </table> */}
             </div>
           </div>
-          <Modal
-            onCancel={() => setVisible(false)}
-            footer={null}
-            open={visible}
-          >
-            <CategoryForm
-              value={updatedName}
-              setValue={setUpdatedName}
-              handleSubmit={handleUpdate}
-            />
-          </Modal>
+          <DeleteModal
+            open={openDeleteModal}
+            setOpen={setOpenDeleteModal}
+            handleDelete={handleDelete}
+            deleteId={deleteId}
+            isLoading={deleteLoading}
+          />
+          <CategoryForm
+            handleSubmit={handleSubmit}
+            value={name}
+            setValue={setName}
+            setVisible={setVisible}
+            visible={visible}
+          />
+          <CategoryForm
+            handleSubmit={handleUpdate}
+            value={updatedName}
+            setValue={setUpdatedName}
+            setVisible={setEditVisible}
+            visible={editVisible}
+          />
         </div>
       </div>
     </Layout>

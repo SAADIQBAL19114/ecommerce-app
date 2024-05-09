@@ -9,8 +9,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ User, Product }) {
       // define association here
-      // this.belongsTo(User, { foreignKey: "userId" });
-      // this.belongsTo(Product, { foreignKey: "userId" });
+
+      this.belongsTo(User, { foreignKey: "userId" });
+      this.belongsTo(Product, { foreignKey: "userId" });
+
     }
   }
   Cart.init(
@@ -18,6 +20,11 @@ module.exports = (sequelize, DataTypes) => {
       quantity: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+
+      Total:{
+        type:DataTypes.INTEGER,
+        allowNull:false
       },
       userId: {
         type: DataTypes.INTEGER,

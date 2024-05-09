@@ -2,9 +2,12 @@ import React from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../../context/auth";
 import { toast } from "react-toastify";
+import { useCart } from "../../context/cart";
+import { Badge } from "antd";
 
-const Header = () => {
+const Header = ({ productLength }) => {
   const [auth, setAuth] = useAuth();
+  const [cart, setCart] = useCart();
 
   const handleLogout = () => {
     setAuth({
@@ -12,6 +15,9 @@ const Header = () => {
       user: null,
       token: "",
     });
+    setCart(
+      cart.length = 0
+    )
     localStorage.removeItem("auth");
     toast.success("Logout Successfully");
   };
@@ -33,7 +39,7 @@ const Header = () => {
           </button>
           <div className="collapse navbar-collapse" id="navbarTogglerDemo01">
             <Link to="/" className="navbar-brand">
-              Ecommerce App
+              💻 Gondal Store
             </Link>
             <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
               <li className="nav-item">
@@ -41,28 +47,23 @@ const Header = () => {
                   Home
                 </NavLink>
               </li>
-              <li className="nav-item">
-                <NavLink to="/category" className="nav-link">
-                  Category
-                </NavLink>
-              </li>
               {!auth.user ? (
                 <>
                   <li className="nav-item">
-                    <NavLink to="/register" className="nav-link">
+                    <Link to="/register" className="nav-link">
                       Register
-                    </NavLink>
+                    </Link>
                   </li>
                   <li className="nav-item">
-                    <NavLink to="/login" className="nav-link">
+                    <Link to="/login" className="nav-link">
                       Login
-                    </NavLink>
+                    </Link>
                   </li>
                 </>
               ) : (
                 <>
                   <li className="nav-item dropdown">
-                    <NavLink
+                    <Link
                       className="nav-link dropdown-toggle"
                       href="#"
                       role="button"
@@ -70,25 +71,28 @@ const Header = () => {
                       aria-expanded="false"
                     >
                       {auth?.user?.name}
-                    </NavLink>
+                    </Link>
                     <ul className="dropdown-menu">
                       <li>
-                        <NavLink
-                          to= {auth?.user?.role === 1 ? "/dashboard/admin" : "/dashboard/user"}
+                        <Link
+                          to={
+                            auth?.user?.role === 1
+                              ? "/dashboard/admin"
+                              : "/dashboard/user"
+                          }
                           className="dropdown-item"
-                          href="#"
                         >
                           Dashboard
-                        </NavLink>
+                        </Link>
                       </li>
                       <li>
-                        <NavLink
+                        <Link
                           to="/login"
                           onClick={handleLogout}
                           className="dropdown-item"
                         >
                           Logout
-                        </NavLink>
+                        </Link>
                       </li>
                     </ul>
                   </li>
@@ -96,7 +100,9 @@ const Header = () => {
               )}
               <li className="nav-item">
                 <NavLink to="/cart" className="nav-link">
-                  Cart (0)
+                  <Badge count={cart?.length} showZero offset={[10, -5]}>
+                    Cart
+                  </Badge>
                 </NavLink>
               </li>
             </ul>

@@ -6,16 +6,19 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { AuthProvider } from "./context/auth";
+import { CartProvider } from "./context/cart";
 
 import "react-toastify/dist/ReactToastify.css";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <AuthProvider>
-    <BrowserRouter>
-      <App />
-      <ToastContainer position="top-center" autoClose={2000} />
-    </BrowserRouter>
+    <CartProvider>
+      <BrowserRouter>
+        <App />
+        <ToastContainer position="top-center" autoClose={1000} />
+      </BrowserRouter>
+    </CartProvider>
   </AuthProvider>
 );
 

@@ -6,14 +6,7 @@ const AdminMenu = () => {
     <>
       <div className="text-center">
         <div className="list-group">
-          <h4>Admin Panal</h4>
-          <NavLink
-            to="/dashboard/user/profile"
-            className="list-group-item list-group-item-action"
-            aria-current="true"
-          >
-            Profile
-          </NavLink>
+          <h4>User Panal</h4>
           <NavLink
             to="/dashboard/user/orders"
             className="list-group-item list-group-item-action"

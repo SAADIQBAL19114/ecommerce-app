@@ -11,8 +11,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ Category, Cart, ProductDetails }) {
       // define association here
-      // this.belongsTo(Category, { foreignKey: "categoryId" });
-      // this.hasMany(Cart, { foreignKey: "userId" });
+
+      this.belongsTo(Category, { foreignKey: "categoryId" });
+      this.hasMany(Cart, { foreignKey: "userId" });
+
       // this.hasMany(ProductDetails, { foreignKey: "ProductDetailsId" });
     }
   }
@@ -36,6 +38,16 @@ module.exports = (sequelize, DataTypes) => {
       image: {
         type: DataTypes.STRING,
       },
+
+      price: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      quantity: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+
       categoryId: {
         type: DataTypes.INTEGER,
         allowNull: false,
